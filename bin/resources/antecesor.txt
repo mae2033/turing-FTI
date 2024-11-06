@@ -1,0 +1,23 @@
+MAQUINA antecesor de un binario
+// simbolos de entrada
+0 1 
+// simbolo espacio
+-
+// numero de estados
+3
+// estado inicial
+0 
+// transiciones: formato (lee, escribe, mueve, salta)
+// estado 0 - Inicio: moverse a la derecha hasta FDC
+// cumple la logica R_espacio L
+3
+1 1 R 0
+0 0 R 0
+- - L 1
+// estado 1 - proceso de decremento 
+3
+0 1 L 1
+1 0 R 2
+- 0 R 2
+// estado 2 se detiene la maquina no hay transiciones definidas
+0
