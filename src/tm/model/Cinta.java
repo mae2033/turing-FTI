@@ -2,12 +2,12 @@ package tm.model;
 
 // en desuso
 // mejorar implementacion
-public class Tape {
-	
+public class Cinta {
+
 	@SuppressWarnings("unused")
 	private StringBuffer tape;
 
-	public Tape(String inputStr, char blank) {
+	public Cinta(String inputStr, char blank) {
 		this.tape = new StringBuffer(buildTape(inputStr, blank));
 	}
 

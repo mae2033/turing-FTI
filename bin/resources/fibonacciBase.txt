@@ -1,0 +1,23 @@
+MAQUINA fibonacci base 
+// simbolos de entrada
+0 1 #
+// simbolo espacio
+-
+// numero de estados
+4
+// estado inicial
+0 
+// transiciones: formato (lee, escribe, mueve, salta)
+// estado 0: 'R-espacio->0R'
+3
+0 0 L 3
+1 1 L 3
+- 0 R 1
+// estado 1: '#R' 
+1
+- # R 2
+// estado 2: 1
+1
+- 1 R 3
+// estado 3: se detiene la maquina no hay transiciones definidas
+0

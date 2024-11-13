@@ -23,7 +23,7 @@ public class Transicion {
 
 	@Override
 	public String toString() {
-		return "[read=" + read + ", write=" + write + ", shift=" + shift + ", nextState=" + nextState + "]";
+		return "[Lee=" + read + ", escribe=" + write + ", desplaza=" + shift + ", sig.Estado=" + nextState + "]";
 	}
 
 }

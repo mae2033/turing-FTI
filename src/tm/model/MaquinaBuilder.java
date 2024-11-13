@@ -6,15 +6,15 @@ import java.util.Scanner;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public class Builder {
-	
+public class MaquinaBuilder {
+
 	private Scanner fs;
 
 	/**
 	 * @param f Un objeto {@link Scanner} que se utiliza para leer la configuración
 	 *          de la máquina desde una fuente de entrada.
 	 */
-	public Builder(Scanner f) {
+	public MaquinaBuilder(Scanner f) {
 		this.fs = f;
 	}
 
@@ -34,11 +34,11 @@ public class Builder {
 	public void buildMachine(Maquina m) {
 		m.nameMachine = readString();
 		m.alpha = readAlphabet();
-		m.blankSym = readChar();
-		m.stateCount = readInt();
-		m.initState = readInt();
-		m.currState = m.initState;
-		for (int i = 0; i < m.stateCount; i++)
+		m.espacioSym = readChar();
+		m.cantidadEstados = readInt();
+		m.estadoInicial = readInt();
+		m.estadoActual = m.estadoInicial;
+		for (int i = 0; i < m.cantidadEstados; i++)
 			addState(i, m);
 	}
 
@@ -59,7 +59,7 @@ public class Builder {
 
 		ArrayList<Transicion> trs = new ArrayList<>();
 		if (trCount == 0)
-			m.finalState = ind;
+			m.estadoFinal = ind;
 
 		for (int i = 0; i < trCount; i++) {
 			String s = readString();

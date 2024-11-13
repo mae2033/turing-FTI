@@ -1,8 +1,12 @@
 package tm.app;
 
 import tm.model.Maquina;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.util.List;
 
-import tm.model.Builder;
+import javax.swing.JOptionPane;
+
 import tm.utils.FileScanner;
 import tm.utils.FileValidator;
 import tm.view.ExecutionFrame;
@@ -12,7 +16,6 @@ public class AppController {
 
 	private FileScanner fs;
 	private FileValidator fv;
-	private Builder builder;
 	private Maquina maquina;
 	private WelcomeScreen wsGUI;
 	private ExecutionFrame efGUI;
@@ -31,14 +34,6 @@ public class AppController {
 
 	public void setFv(FileValidator fv) {
 		this.fv = fv;
-	}
-
-	public Builder getBuilder() {
-		return builder;
-	}
-
-	public void setBuilder(Builder builder) {
-		this.builder = builder;
 	}
 
 	public Maquina getMaquina() {
@@ -71,7 +66,7 @@ public class AppController {
 
 	public void ejecutar(String inputStr) throws InterruptedException {
 		setCinta(inputStr);
-		maquina.runTuring(6);
+		maquina.runTuring(maquina.getInitIndex());
 	}
 
 	public String getResultado() {
@@ -86,9 +81,53 @@ public class AppController {
 		return maquina.getTape();
 	}
 
-	public void volverInicio() {
-		efGUI.dispose();
-		wsGUI.setVisible(true);
+	public void guiCinta(String s) {
+		efGUI.setTape(s);
 	}
 
+	public int getIndice() {
+		return maquina.getIndice();
+	}
+
+	public void iniciarMaquina(File file) {
+		try {
+			System.out.println(fv.validarArchivo(file));
+			fs = new FileScanner(file);
+			maquina.carga(fs.getFileScan());
+			seleccion(maquina.getName());
+		} catch (FileNotFoundException e) {
+			JOptionPane.showMessageDialog(null, "File not found: " + e.getMessage(), "Error",
+					JOptionPane.ERROR_MESSAGE);
+		}
+	}
+
+	private void seleccion(String s) {
+		wsGUI.dispose();
+		efGUI.setTitle(s);
+		efGUI.setVisible(true);
+	}
+
+	public void volverInicio() {
+		efGUI.cleanText();
+		efGUI.dispose();
+		wsGUI.setVisible(true);
+		maquina.setTape("");
+	}
+
+	public void interrumpir() {
+		maquina.interrupt();
+	}
+
+	public void setVelocidad(int v) {
+		maquina.setVelocidad(v);
+	}
+
+	public boolean formatoValido(File archivoSeleccionado) {
+		return fv.validarArchivo(archivoSeleccionado);
+	}
+
+	public List<String> getError() {
+		return fv.getErrores();
+
+	}
 }

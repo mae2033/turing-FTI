@@ -14,7 +14,7 @@ public class FileValidator {
 	private List<String> errs = new ArrayList<>();
 //	private int countState; // cantidad de estados usarlo para la validacion de saltos
 //	private Set<Character> alpha; // usarlo para validar que se lee y que se escribe
-	
+
 	public boolean validarArchivo(File file) {
 		try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
 			int numeroLinea = 0;
@@ -186,8 +186,8 @@ public class FileValidator {
 			return false;
 		}
 
-		if (!partes[2].equals("L") && !partes[2].equals("R")) {
-			errs.add("Línea " + numeroLinea + ": La transición debe aclarar el desplazamiento en cinta (L,R).");
+		if (!partes[2].equals("L") && !partes[2].equals("R") && !partes[2].equals("N")) {
+			errs.add("Línea " + numeroLinea + ": La transición debe aclarar el desplazamiento en cinta (L,R,N).");
 			return false;
 		}
 		return true;

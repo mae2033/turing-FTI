@@ -5,8 +5,12 @@ import java.io.FileNotFoundException;
 import java.util.Scanner;
 
 public class FileScanner {
+
 	Scanner scan = new Scanner(System.in);
 	Scanner fileScan;
+
+	public FileScanner() {
+	}
 
 	public FileScanner(File f) throws FileNotFoundException {
 		setFileScan(new Scanner(f));
@@ -19,5 +23,10 @@ public class FileScanner {
 
 	public void setFileScan(Scanner fileScan) {
 		this.fileScan = fileScan;
+	}
+
+	public void setFileScan(File file) throws FileNotFoundException {
+		this.fileScan = new Scanner(file);
+		getFileScan().useDelimiter("\n");
 	}
 }
