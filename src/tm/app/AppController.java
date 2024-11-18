@@ -66,7 +66,8 @@ public class AppController {
 
 	public void ejecutar(String inputStr) throws InterruptedException {
 		setCinta(inputStr);
-		maquina.runTuring(maquina.getInitIndex());
+//		maquina.runTuring(maquina.getInitIndex());
+		maquina.runTuringWithTimer();
 	}
 
 	public String getResultado() {
@@ -81,8 +82,8 @@ public class AppController {
 		return maquina.getTape();
 	}
 
-	public void guiCinta(String s) {
-		efGUI.setTape(s);
+	public void guiCinta(char c, int i) {
+		efGUI.updateTape(c, i);
 	}
 
 	public int getIndice() {
@@ -91,7 +92,8 @@ public class AppController {
 
 	public void iniciarMaquina(File file) {
 		try {
-			System.out.println(fv.validarArchivo(file));
+
+			validar(file);
 			fs = new FileScanner(file);
 			maquina.carga(fs.getFileScan());
 			seleccion(maquina.getName());
@@ -99,6 +101,11 @@ public class AppController {
 			JOptionPane.showMessageDialog(null, "File not found: " + e.getMessage(), "Error",
 					JOptionPane.ERROR_MESSAGE);
 		}
+	}
+
+	private void validar(File file) {
+		boolean value = fv.validarArchivo(file);
+		System.out.println(value);
 	}
 
 	private void seleccion(String s) {
@@ -115,7 +122,7 @@ public class AppController {
 	}
 
 	public void interrumpir() {
-		maquina.interrupt();
+		maquina.stop();
 	}
 
 	public void setVelocidad(int v) {
@@ -129,5 +136,9 @@ public class AppController {
 	public List<String> getError() {
 		return fv.getErrores();
 
+	}
+
+	public void updateTextField(String string) {
+		efGUI.setText(string);
 	}
 }

@@ -15,7 +15,7 @@ MAQUINA fibonacci
 // estado 1: 1(q2,#,R)
 1
 - # R 2
-// estado 2
+// estado 2: -(q3,1,N)
 1
 - 1 N 3
 // estado 3 estado final
@@ -128,7 +128,7 @@ MAQUINA fibonacci
 0 0 L 21
 1 1 N 23
 - - R 22
-// estado 22 limpia si ya la copia es de solo 0's
+// estado 22 limpia si ya la copia de es de solo 0's
 2 
 0 - R 22
 - - N 3
