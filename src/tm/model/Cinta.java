@@ -1,7 +1,8 @@
 package tm.model;
 
 // en desuso
-// mejorar implementacion
+// responsabilidad simple
+// mejora implementacion de maquina
 public class Cinta {
 
 	@SuppressWarnings("unused")

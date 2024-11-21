@@ -31,11 +31,9 @@ public class Maquina {
 	StringBuffer Tape = new StringBuffer(); // Cinta
 	List<Estado> states = new ArrayList<>(); // estados
 
-	private int indice;
 	private String result;
 
 	public Maquina() {
-		indice = INIT_INDEX;
 	}
 
 	public void carga(Scanner f) {
@@ -99,7 +97,7 @@ public class Maquina {
 		for (Transicion tr : st.transiciones) {
 			if (tr.read == Tape.charAt(index)) {
 				Tape.replace(index, index + 1, String.valueOf(tr.write));
-				controller.guiCinta(tr.write, index);
+				escribirCinta(tr.write, index);
 				estadoActual = tr.nextState;
 				switch (tr.shift) {
 				case 'R':
@@ -116,6 +114,12 @@ public class Maquina {
 		return -1;
 	}
 
+	private void escribirCinta(char write, int index) {
+		if (write == espacioSym)
+			write = '\u25B2';
+		controller.guiCinta(write, index);
+	}
+
 	/* metodo para pruebas */
 	public String displayTape(int index) {
 		String aTape = printTape(index);
@@ -126,7 +130,7 @@ public class Maquina {
 	public String printTape(int index) {
 		StringBuilder output = new StringBuilder();
 		output.append(Tape).append("\n");
-		output.append(String.valueOf(' ').repeat(index - 1));
+		output.append(String.valueOf(' ').repeat(index));
 		output.append(" ^q").append(estadoActual).append("\n");
 		return output.toString();
 	}
@@ -138,8 +142,20 @@ public class Maquina {
 	}
 
 	public void setTape(String inputstr) {
+		if (running)
+			return;
 		this.Tape = new StringBuffer(buildTape(inputstr, espacioSym));
 		printTape(INIT_INDEX);
+	}
+
+	public boolean validarInput(String inputstr) {
+		char[] array = inputstr.toCharArray();
+		for (char c : array) {
+			if (!alpha.contains(c))
+				return false;
+
+		}
+		return true;
 	}
 
 	public String getName() {
@@ -176,10 +192,6 @@ public class Maquina {
 
 	public void setController(AppController controller) {
 		this.controller = controller;
-	}
-
-	public int getIndice() {
-		return indice;
 	}
 
 	public int getInitIndex() {

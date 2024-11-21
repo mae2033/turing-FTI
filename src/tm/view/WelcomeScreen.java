@@ -22,7 +22,6 @@ import javax.swing.SwingConstants;
 
 import java.awt.Font;
 
-@SuppressWarnings("serial")
 public class WelcomeScreen extends JFrame {
 	private AppController controller;
 
@@ -45,7 +44,7 @@ public class WelcomeScreen extends JFrame {
 		JPanel buttonPanel = new JPanel();
 		buttonPanel.setLayout(new FlowLayout());
 
-		// Botón para seleccionar archivo
+		// Botï¿½n para seleccionar archivo
 		JButton startButton = new JButton("Seleccionar Maquina");
 		startButton.setFont(new Font("SansSerif", Font.PLAIN, 14));
 		startButton.addActionListener(new ActionListener() {
@@ -56,7 +55,7 @@ public class WelcomeScreen extends JFrame {
 		});
 		buttonPanel.add(startButton);
 
-		// Botón para salir
+		// Botï¿½n para salir
 		JButton exitButton = new JButton("Salir");
 		exitButton.setFont(new Font("SansSerif", Font.PLAIN, 14));
 		exitButton.addActionListener(new ActionListener() {
