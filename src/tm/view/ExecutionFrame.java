@@ -17,12 +17,14 @@ import javax.swing.SwingConstants;
 
 import tm.app.AppController;
 
+@SuppressWarnings("serial")
 public class ExecutionFrame extends JFrame {
 
 	private AppController controller;
 
 	private JButton btnExecute;
 	private JButton btnBack;
+	private JButton btnClean;
 	private JSlider sliderVelocidad;
 	private JTextField texto;
 	private JPanel cintaPanel;
@@ -31,6 +33,8 @@ public class ExecutionFrame extends JFrame {
 	private int indice_ant = -1;
 	private int TAPE_SIZE;
 	private int velocidad = 500; // Velocidad inicial
+
+	private int espacioAdicional = 0;
 
 	public ExecutionFrame() {
 		super();
@@ -54,7 +58,7 @@ public class ExecutionFrame extends JFrame {
 	}
 
 	private void initLabels() {
-		lblInterval = new JLabel(String.format("intervalo: " + velocidad + " ms"));
+		lblInterval = new JLabel(String.format("delay: " + velocidad + " ms"));
 		lblInterval.setFont(new Font("Tahoma", Font.BOLD, 13));
 		lblInterval.setBounds(244, 98, 125, 27);
 		getContentPane().add(lblInterval);
@@ -89,6 +93,8 @@ public class ExecutionFrame extends JFrame {
 		btnBack.setBounds(379, 140, 125, 27);
 		btnBack.addActionListener(e -> controller.volverInicio());
 		getContentPane().add(btnBack);
+
+		btnClean = new JButton("limpiar");
 	}
 
 	private void initTextField() {
@@ -101,7 +107,7 @@ public class ExecutionFrame extends JFrame {
 	}
 
 	private void initTapePanel() {
-		TAPE_SIZE = 20; // valor inicial
+		TAPE_SIZE = 5; // valor inicial
 		cintaPanel = new JPanel();
 		cintaPanel.setLayout(new GridLayout(1, TAPE_SIZE));
 
@@ -128,12 +134,12 @@ public class ExecutionFrame extends JFrame {
 		btnExecute.setEnabled(false);
 		try {
 			controller.ejecutar(input);
-
+			btnExecute.setEnabled(true);
 		} catch (InterruptedException ex) {
 			btnExecute.setEnabled(true);
 			JOptionPane.showMessageDialog(this, "Error: " + ex.getMessage());
 		}
-		btnExecute.setEnabled(true);
+
 	}
 
 	public void actualizarCinta() {
@@ -154,6 +160,7 @@ public class ExecutionFrame extends JFrame {
 	}
 
 	public void updateTape(char c, int indice) {
+		indice += espacioAdicional;
 		redimensionarCinta(indice);
 		if (indice_ant != -1) {
 			cinta[indice_ant].setText(cinta[indice_ant].getText().replace("[", "").replace("]", ""));
@@ -169,6 +176,32 @@ public class ExecutionFrame extends JFrame {
 	}
 
 	public void redimensionarCinta(int indice) {
+		if (indice <= 0) {
+			int espacioAdicional = Math.abs(indice) + 2; // Espacio necesario hacia la izquierda
+			int nuevoTamano = TAPE_SIZE + espacioAdicional;
+
+			JLabel[] nuevaCinta = new JLabel[nuevoTamano];
+
+			// Desplazar los elementos existentes hacia la derecha
+			System.arraycopy(cinta, 0, nuevaCinta, espacioAdicional, TAPE_SIZE);
+
+			// Inicializar las nuevas posiciones vacías al inicio
+			for (int i = 0; i < espacioAdicional; i++) {
+				nuevaCinta[i] = new JLabel("\u25B2", SwingConstants.CENTER);
+				nuevaCinta[i].setBorder(BorderFactory.createLineBorder(Color.BLACK));
+				nuevaCinta[i].setFont(new Font("Arial", Font.PLAIN, 24));
+				cintaPanel.add(nuevaCinta[i], i);
+			}
+
+			cinta = nuevaCinta;
+			TAPE_SIZE = nuevoTamano;
+			cintaPanel.revalidate();
+			cintaPanel.repaint();
+
+			// Ajustar la posición inicial lógica para que coincida con la expansión
+			this.espacioAdicional  += espacioAdicional;
+		}
+
 		if (indice >= TAPE_SIZE) {
 			int nuevoTamano = indice + 2; // Añade espacio adicional
 			JLabel[] nuevaCinta = new JLabel[nuevoTamano];

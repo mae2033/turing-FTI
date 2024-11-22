@@ -82,12 +82,8 @@ public class AppController {
 		return maquina.getTape();
 	}
 
-	public void guiCinta(char c, int i) {
+	public void escribirCinta(char c, int i) {
 		efGUI.updateTape(c, i);
-	}
-
-	public int getIndice() {
-		return maquina.getIndice();
 	}
 
 	public void iniciarMaquina(File file) {

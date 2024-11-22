@@ -16,7 +16,7 @@ public class Maquina {
 	private Timer timer;
 	private boolean running = false; // Control del estado
 	static int VELOCIDAD = 500;
-	final int INIT_INDEX = 10;
+	final int INIT_INDEX = 50;
 	private int index = INIT_INDEX; // Campo de instancia para el índice
 	private static final char LIMITE_MARCA = '~';
 	Scanner fs;
@@ -117,7 +117,7 @@ public class Maquina {
 	private void escribirCinta(char write, int index) {
 		if (write == espacioSym)
 			write = '\u25B2';
-		controller.guiCinta(write, index);
+		controller.escribirCinta(write, index - INIT_INDEX + 1);
 	}
 
 	/* metodo para pruebas */
