@@ -28,4 +28,10 @@ Instrucciones para instalar y configurar el proyecto. Puede incluir pasos como:
 ## Documentación
 fotos de las maquinas 
 
+## Descarga
+El simulador se puede usar apartir de un ejecutable jar. Se necesita java para probarlo.
+
+Una alternativa, si quieres hacer tu propio jar y/o modificar el codigo, para esto debes clonar el repo.
+
+
 

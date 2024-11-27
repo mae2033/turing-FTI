@@ -6,6 +6,10 @@ import java.util.Scanner;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+/**
+ * Clase herramienta para la construccion de una {@link Maquina} turing simulada
+ *
+ */
 public class MaquinaBuilder {
 
 	private Scanner fs;
@@ -18,25 +22,30 @@ public class MaquinaBuilder {
 		this.fs = f;
 	}
 
-//	/**
-//	 * Construye la máquina de Turing a partir de la entrada proporcionada a través
-//	 * de un objeto {@link Scanner}.
-//	 * 
-//	 * Este método lee el título de la máquina, los símbolos de entrada, el símbolo
-//	 * de espacio, la cantidad de estados definidos y el estado inicial. A partir de
-//	 * los símbolos de entrada, se crea un conjunto único de caracteres. Luego, se
-//	 * establece el estado actual en el estado inicial y se agregan los estados a la
-//	 * máquina mediante el método {@link #addEstado(int)}.
-//	 * 
-//	 * @param f Un objeto {@link Scanner} que se utiliza para leer la configuración
-//	 *          de la máquina desde una fuente de entrada.
-//	 */
+	/**
+	 * Construye la máquina de Turing a partir de la entrada proporcionada a través
+	 * de un objeto {@link Maquina}.
+	 * 
+	 * Este método lee el título de la máquina, los símbolos de entrada, el símbolo
+	 * de espacio, la cantidad de estados definidos y el estado inicial. A partir de
+	 * los símbolos de entrada, se crea un conjunto único de caracteres. Luego, se
+	 * establece el estado actual en el estado inicial y se agregan los estados a la
+	 * máquina mediante el método {@link #addEstado(int)}.
+	 * 
+	 * @param m Un objeto {@link Maquina} que se utiliza para leer la configuración
+	 *          de la máquina desde una fuente de entrada.
+	 */
 	public void buildMachine(Maquina m) {
 		m.nameMachine = readString();
+		System.out.println(m.nameMachine);
 		m.alpha = readAlphabet();
+		System.out.println(m.alpha);
 		m.espacioSym = readChar();
+		System.out.println(m.espacioSym);
 		m.cantidadEstados = readInt();
+		System.out.println(m.cantidadEstados);
 		m.estadoInicial = readInt();
+		System.out.println(m.estadoInicial);
 		m.estadoActual = m.estadoInicial;
 		for (int i = 0; i < m.cantidadEstados; i++)
 			addState(i, m);

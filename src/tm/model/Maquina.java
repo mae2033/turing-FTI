@@ -28,34 +28,29 @@ public class Maquina {
 	int estadoFinal;
 	char espacioSym;
 
-	StringBuffer Tape = new StringBuffer(); // Cinta
-	List<Estado> states = new ArrayList<>(); // estados
+	StringBuffer Tape; // Cinta
+	List<Estado> states; // estados
 
 	private String result;
 
-	public Maquina() {
-	}
-
 	public void carga(Scanner f) {
+		alpha = null;
+		Tape = new StringBuffer();
+		states = new ArrayList<>();
 		MaquinaBuilder builder = new MaquinaBuilder(f);
 		builder.buildMachine(this);
 	}
 
-	public Maquina(Scanner f) {
-		MaquinaBuilder builder = new MaquinaBuilder(f);
-		builder.buildMachine(this);
-	}
-
-	public void runTuringWithTimer() {
+	public void runTuringWithTimer(String inputstr) {
 		if (running)
 			return;
 		reset();
+		setTape(inputstr);
 		running = true;
 
 		if (timer == null) {
 			timer = new Timer();
 		}
-		// Configuración del TimerTask
 		TimerTask task = new TimerTask() {
 			@Override
 			public void run() {
@@ -80,12 +75,14 @@ public class Maquina {
 		timer.scheduleAtFixedRate(task, VELOCIDAD, VELOCIDAD + 1);
 	}
 
-	public void runTuring(int index) throws InterruptedException {
+	public void runTuring(String inputstr) throws InterruptedException {
+		setTape(inputstr);
+		int index = INIT_INDEX;
 		while (estadoActual != estadoFinal) {
 			index = makeTrans(index);
 			if (index == -1)
 				throw new InterruptedException("ERROR: Cabeza salio de la Tape. Maquina detenida.");
-			displayTape(index);
+			printTape(index);
 		}
 		update();
 	}
@@ -142,8 +139,8 @@ public class Maquina {
 	}
 
 	public void setTape(String inputstr) {
-		if (running)
-			return;
+//		if (running)
+//			return;
 		this.Tape = new StringBuffer(buildTape(inputstr, espacioSym));
 		printTape(INIT_INDEX);
 	}
@@ -204,6 +201,10 @@ public class Maquina {
 
 	public String getResult() {
 		return result;
+	}
+
+	public boolean isRunning() {
+		return running;
 	}
 
 }

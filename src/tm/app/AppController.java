@@ -65,9 +65,7 @@ public class AppController {
 	}
 
 	public void ejecutar(String inputStr) throws InterruptedException {
-		setCinta(inputStr);
-//		maquina.runTuring(maquina.getInitIndex());
-		maquina.runTuringWithTimer();
+		maquina.runTuringWithTimer(inputStr);
 	}
 
 	public String getResultado() {
@@ -88,8 +86,9 @@ public class AppController {
 
 	public void iniciarMaquina(File file) {
 		try {
-
-			validar(file);
+			if (!validar(file)) // si no es valido es archivo cierra, refactorizar
+				System.exit(0);
+			System.out.println(file.getName()); // los archivos se cambian, filechooser es correcto
 			fs = new FileScanner(file);
 			maquina.carga(fs.getFileScan());
 			seleccion(maquina.getName());
@@ -99,9 +98,10 @@ public class AppController {
 		}
 	}
 
-	private void validar(File file) {
+	private boolean validar(File file) {
 		boolean value = fv.validarArchivo(file);
 		System.out.println(value);
+		return value;
 	}
 
 	private void seleccion(String s) {
@@ -114,7 +114,8 @@ public class AppController {
 		efGUI.cleanText();
 		efGUI.dispose();
 		wsGUI.setVisible(true);
-		maquina.setTape("");
+		maquina.stop();
+		maquina.reset();
 	}
 
 	public void interrumpir() {
@@ -131,7 +132,6 @@ public class AppController {
 
 	public List<String> getError() {
 		return fv.getErrores();
-
 	}
 
 	public void updateTextField(String string) {

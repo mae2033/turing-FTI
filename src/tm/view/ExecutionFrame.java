@@ -5,6 +5,8 @@ import java.awt.Font;
 import java.awt.GridLayout;
 
 import javax.swing.BorderFactory;
+import javax.swing.BoxLayout;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -16,37 +18,64 @@ import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 
 import tm.app.AppController;
+import java.awt.FlowLayout;
 
 @SuppressWarnings("serial")
 public class ExecutionFrame extends JFrame {
 
 	private AppController controller;
 
+	private JPanel buttonsPanel;
+	private JPanel speedPanel;
 	private JButton btnExecute;
 	private JButton btnBack;
-	private JButton btnClean;
 	private JSlider sliderVelocidad;
 	private JTextField texto;
 	private JPanel cintaPanel;
 	private JLabel[] cinta;
 	private JLabel lblInterval;
 	private int indice_ant = -1;
-	private int TAPE_SIZE;
-	private int velocidad = 500; // Velocidad inicial
-
 	private int espacioAdicional = 0;
+	private int TAPE_SIZE;
+
+	private int velocidad = 500; // Velocidad inicial
 
 	public ExecutionFrame() {
 		super();
-
 		// Frame config
 		frameConfig();
 		// inicializar componentes
-		initLabels();
-		initSlider();
-		initButtons();
+		initSpeedPanel();
+		initPanelButtons();
 		initTextField();
 		initTapePanel();
+	}
+
+	private void initSpeedPanel() {
+		lblInterval = new JLabel(String.format("delay: " + velocidad + " ms"));
+		lblInterval.setFont(new Font("Tahoma", Font.BOLD, 13));
+//		lblInterval.setBounds(244, 98, 125, 27);
+
+		sliderVelocidad = new JSlider(0, 1000, 500);
+//		sliderVelocidad.setBounds(10, 98, 224, 32);
+		sliderVelocidad.setMajorTickSpacing(250);
+		sliderVelocidad.setSnapToTicks(true);
+		sliderVelocidad.setPaintLabels(true);
+		sliderVelocidad.addChangeListener(e -> {
+			velocidad = sliderVelocidad.getValue();
+			lblInterval.setText("delay: " + velocidad + " ms");
+			actualizarTimer();
+		});
+		sliderVelocidad.setAutoscrolls(true);
+
+		speedPanel = new JPanel();
+		speedPanel.setBounds(10, 124, 318, 42);
+		getContentPane().add(speedPanel);
+		speedPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
+
+		speedPanel.add(sliderVelocidad);
+		speedPanel.add(lblInterval);
+
 	}
 
 	private void frameConfig() {
@@ -57,51 +86,31 @@ public class ExecutionFrame extends JFrame {
 		getContentPane().setLayout(null);
 	}
 
-	private void initLabels() {
-		lblInterval = new JLabel(String.format("delay: " + velocidad + " ms"));
-		lblInterval.setFont(new Font("Tahoma", Font.BOLD, 13));
-		lblInterval.setBounds(244, 98, 125, 27);
-		getContentPane().add(lblInterval);
-	}
+	private void initPanelButtons() {
+		buttonsPanel = new JPanel();
+		buttonsPanel.setBounds(390, 140, 114, 27);
+		getContentPane().add(buttonsPanel);
 
-	private void initSlider() {
-		sliderVelocidad = new JSlider(0, 1000, 500);
-		sliderVelocidad.setBounds(10, 98, 224, 32);
-		sliderVelocidad.setMajorTickSpacing(250);
-		sliderVelocidad.setSnapToTicks(true);
-		sliderVelocidad.setPaintLabels(true);
-		sliderVelocidad.addChangeListener(e -> {
-			velocidad = sliderVelocidad.getValue();
-			lblInterval.setText("intervalo: " + velocidad + " ms");
-			actualizarTimer();
-		});
-		sliderVelocidad.setAutoscrolls(true);
-		getContentPane().add(sliderVelocidad);
-	}
-
-	private void initButtons() {
-		btnExecute = new JButton("ejecutar");
+		btnExecute = new JButton(new ImageIcon(ExecutionFrame.class.getResource("/images/Play22.png")));
 		btnExecute.setToolTipText("run machine");
-		btnExecute.setBounds(244, 140, 125, 27);
 		btnExecute.setFont(new Font("Tahoma", Font.PLAIN, 15));
 		btnExecute.addActionListener(e -> run(texto.getText()));
-		getContentPane().add(btnExecute);
 
-		btnBack = new JButton("volver");
+		btnBack = new JButton(new ImageIcon(ExecutionFrame.class.getResource("/images/Undo22.png")));
 		btnBack.setToolTipText("return to main");
 		btnBack.setFont(new Font("Tahoma", Font.PLAIN, 15));
-		btnBack.setBounds(379, 140, 125, 27);
 		btnBack.addActionListener(e -> controller.volverInicio());
-		getContentPane().add(btnBack);
+		buttonsPanel.setLayout(new BoxLayout(buttonsPanel, BoxLayout.X_AXIS));
 
-		btnClean = new JButton("limpiar");
+		buttonsPanel.add(btnExecute);
+		buttonsPanel.add(btnBack);
 	}
 
 	private void initTextField() {
 		texto = new JTextField();
 		texto.setToolTipText("input");
 		texto.setFont(new Font("Tahoma", Font.PLAIN, 15));
-		texto.setLocation(10, 140);
+		texto.setLocation(154, 99);
 		texto.setSize(224, 27);
 		getContentPane().add(texto);
 	}
@@ -131,7 +140,7 @@ public class ExecutionFrame extends JFrame {
 	}
 
 	private void run(String input) {
-		btnExecute.setEnabled(false);
+		// updateCompleteTape(input);
 		try {
 			controller.ejecutar(input);
 			btnExecute.setEnabled(true);
@@ -139,12 +148,14 @@ public class ExecutionFrame extends JFrame {
 			btnExecute.setEnabled(true);
 			JOptionPane.showMessageDialog(this, "Error: " + ex.getMessage());
 		}
-
 	}
 
-	public void actualizarCinta() {
-		for (int i = 0; i < 10; i++) {
-			cinta[i].setText("\u25B2");
+	public void updateCompleteTape(String input) {
+		for (int i = 0; i < TAPE_SIZE; i++) {
+			if (i < espacioAdicional && i > espacioAdicional + input.length())
+				cinta[i].setText(input.charAt(i - espacioAdicional) + "");
+			else
+				cinta[i].setText("\u25B2");
 		}
 	}
 
@@ -199,7 +210,7 @@ public class ExecutionFrame extends JFrame {
 			cintaPanel.repaint();
 
 			// Ajustar la posición inicial lógica para que coincida con la expansión
-			this.espacioAdicional  += espacioAdicional;
+			this.espacioAdicional += espacioAdicional;
 		}
 
 		if (indice >= TAPE_SIZE) {
@@ -219,6 +230,11 @@ public class ExecutionFrame extends JFrame {
 			cintaPanel.revalidate();
 			cintaPanel.repaint();
 		}
+	}
+
+	public void reset() {
+		espacioAdicional = 0;
+		initTapePanel();
 	}
 
 	public void setController(AppController controller) {
