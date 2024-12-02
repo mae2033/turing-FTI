@@ -1,0 +1,12 @@
+# .log files
+*.log
+
+# ignore ALL files in ANY directory named temp
+temp/ 
+
+# Eclipse project files
+.classpath
+.project
+
+# 
+.settings/

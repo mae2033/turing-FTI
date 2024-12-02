@@ -6,51 +6,51 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-//import java.util.Set;
+import java.util.Set;
 
 /* refactorizar arreglar lista de errores */
 public class FileValidator {
 
-	private List<String> errs = new ArrayList<>();
-//	private int countState; // cantidad de estados usarlo para la validacion de saltos
-//	private Set<Character> alpha; // usarlo para validar que se lee y que se escribe
+	private List<String> errs;
+	private Set<Character> alpha; // usarlo para validar que se lee y que se escribe
 
 	public boolean validarArchivo(File file) {
+		errs = new ArrayList<>();
 		try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
-			int numeroLinea = 0;
+			int numeroLinea = 1;
 			String linea;
 
 			linea = leerLineaValida(reader, numeroLinea++);
 			if (!validarNombre(linea, numeroLinea++))
-				return false;
+				errs.add("Línea " + numeroLinea + ": Falta el nombre de la máquina o formato incorrecto.");
 
 			linea = leerLineaValida(reader, numeroLinea++);
 			if (!validarAlfabeto(linea, numeroLinea++))
-				return false;
+				errs.add("Línea " + numeroLinea + ": Falta el alfabeto o formato incorrecto.");
 
 			linea = leerLineaValida(reader, numeroLinea++);
 			if (!validarEspacio(linea, numeroLinea++))
-				return false;
+				System.out.println("error espacio");
 
 			linea = leerLineaValida(reader, numeroLinea++);
 			int numeroEstados = validarNumeroEstados(linea, numeroLinea++);
 			if (numeroEstados == -1)
-				return false;
+				System.out.println("error cantidad estados");
 
 			linea = leerLineaValida(reader, numeroLinea++);
 			if (!validarEstadoInicial(linea, numeroLinea++, numeroEstados))
-				return false;
+				System.out.println("error estado inicial");
 
 			for (int estado = 0; estado < numeroEstados; estado++) {
 				linea = leerLineaValida(reader, numeroLinea++);
 				int numeroTransiciones = validarTransicionesInicio(linea, estado, numeroLinea++);
 				if (numeroTransiciones == -1)
-					return false;
+					System.out.println("error no hay transiciones");
 
 				for (int i = 0; i < numeroTransiciones; i++) {
 					linea = leerLineaValida(reader, numeroLinea++);
 					if (!validarTransicion(linea, numeroLinea++))
-						return false;
+						System.out.println("error de transicion:" + i);
 				}
 			}
 
@@ -62,6 +62,9 @@ public class FileValidator {
 		return errs.isEmpty();
 	}
 
+	/**
+	 * Lee las lineas que no sean vacias y no comiencen con '//'
+	 */
 	private String leerLineaValida(BufferedReader reader, int numeroLinea) throws IOException {
 		String linea;
 		do {
@@ -77,7 +80,6 @@ public class FileValidator {
 
 	private boolean validarNombre(String linea, int numeroLinea) {
 		if (linea == null || !linea.startsWith("MAQUINA ")) {
-			errs.add("Línea " + numeroLinea + ": Falta el nombre de la máquina o formato incorrecto.");
 			return false;
 		}
 		return true;
@@ -85,7 +87,6 @@ public class FileValidator {
 
 	private boolean validarAlfabeto(String linea, int numeroLinea) {
 		if (linea == null || linea.trim().isEmpty()) {
-			errs.add("Línea " + numeroLinea + ": Falta el alfabeto o formato incorrecto.");
 			return false;
 		}
 		return true;
@@ -155,7 +156,6 @@ public class FileValidator {
 			return -1;
 		}
 
-		// Verificar que la línea contenga solo un número entero positivo
 		String trimmedLinea = linea.trim();
 		if (!trimmedLinea.matches("\\d+")) {
 			errs.add("Línea " + numeroLinea + ": La cantidad de transiciones debe ser un número entero positivo.");

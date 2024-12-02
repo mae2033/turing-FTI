@@ -3,17 +3,16 @@ MAQUINA sucesor de un binario
 0 1
 // simbolo espacio
 -
-// numero de estados
-3
+// numero de estados, error cantidad de estados
+9
 // estado inicial
 0 
 // transiciones: formato (lee, escribe, mueve, salta)
-// estado 0 - Inicio: moverse a la derecha hasta FDC
-// cumple la logica R_espacio L
+// estado 0 - error de L/R/N 
 3
-1 1 H 0
-0 0 R 0
-- - L 1
+1 1 Y 0
+0 0 M 0
+- - C 1
 // estado 1 - proceso de incremento 
 3
 1 0 L 1

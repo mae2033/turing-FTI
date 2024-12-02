@@ -1,63 +1,50 @@
 package tm.app;
 
-import tm.model.Maquina;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.List;
+import org.apache.log4j.Logger;
 
-import javax.swing.JOptionPane;
-
+import tm.model.Maquina;
 import tm.utils.FileScanner;
 import tm.utils.FileValidator;
+import tm.view.ErrorFrame;
 import tm.view.ExecutionFrame;
 import tm.view.WelcomeScreen;
 
 public class AppController {
+
+	final static Logger logger = Logger.getLogger(AppController.class);
 
 	private FileScanner fs;
 	private FileValidator fv;
 	private Maquina maquina;
 	private WelcomeScreen wsGUI;
 	private ExecutionFrame efGUI;
-
-	public FileScanner getFs() {
-		return fs;
-	}
+	private ErrorFrame errGUI;
 
 	public void setFs(FileScanner fs) {
 		this.fs = fs;
-	}
-
-	public FileValidator getFv() {
-		return fv;
 	}
 
 	public void setFv(FileValidator fv) {
 		this.fv = fv;
 	}
 
-	public Maquina getMaquina() {
-		return maquina;
-	}
-
 	public void setMaquina(Maquina maquina) {
 		this.maquina = maquina;
-	}
-
-	public WelcomeScreen getWsGUI() {
-		return wsGUI;
 	}
 
 	public void setWsGUI(WelcomeScreen wsGUI) {
 		this.wsGUI = wsGUI;
 	}
 
-	public ExecutionFrame getEfGUI() {
-		return efGUI;
-	}
-
 	public void setEfGUI(ExecutionFrame efGUI) {
 		this.efGUI = efGUI;
+	}
+
+	public void setErrGUI(ErrorFrame errGUI) {
+		this.errGUI = errGUI;
 	}
 
 	public String getNombre() {
@@ -69,7 +56,7 @@ public class AppController {
 	}
 
 	public String getResultado() {
-		return maquina.getResult();
+		return maquina.getResultado();
 	}
 
 	public void setCinta(String s) {
@@ -86,25 +73,17 @@ public class AppController {
 
 	public void iniciarMaquina(File file) {
 		try {
-			if (!validar(file)) // si no es valido es archivo cierra, refactorizar
-				System.exit(0);
-			System.out.println(file.getName()); // los archivos se cambian, filechooser es correcto
 			fs = new FileScanner(file);
 			maquina.carga(fs.getFileScan());
 			seleccion(maquina.getName());
 		} catch (FileNotFoundException e) {
-			JOptionPane.showMessageDialog(null, "File not found: " + e.getMessage(), "Error",
-					JOptionPane.ERROR_MESSAGE);
+			logger.error("archivo no encontrado");
+//			showError(e);
 		}
 	}
 
-	private boolean validar(File file) {
-		boolean value = fv.validarArchivo(file);
-		System.out.println(value);
-		return value;
-	}
-
 	private void seleccion(String s) {
+		logger.info("inicio maquina");
 		wsGUI.dispose();
 		efGUI.setTitle(s);
 		efGUI.setVisible(true);
@@ -137,4 +116,10 @@ public class AppController {
 	public void updateTextField(String string) {
 		efGUI.setText(string);
 	}
+
+	public void showError(Object error) {
+		errGUI.showError(error);
+
+	}
+
 }

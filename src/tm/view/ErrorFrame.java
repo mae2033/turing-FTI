@@ -1,7 +1,7 @@
 package tm.view;
 
 import java.awt.BorderLayout;
-import java.util.List;
+import java.awt.Font;
 import java.util.Map;
 
 import javax.swing.JButton;
@@ -9,12 +9,13 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
-import java.awt.Font;
 
-@SuppressWarnings("serial")
+import tm.app.AppController;
+
 public class ErrorFrame extends JFrame {
 
 	private JTextArea errorTextArea;
+	private AppController controller;
 
 	public ErrorFrame() {
 		setTitle("Error");
@@ -53,9 +54,9 @@ public class ErrorFrame extends JFrame {
 	 * @param error El mensaje de error (puede ser String, List, Map, etc.)
 	 */
 	public void showError(Object error) {
+		setVisible(true);
 		String errorMessage = parseError(error);
 		errorTextArea.setText(errorMessage);
-		setVisible(true);
 	}
 
 	/**
@@ -98,22 +99,7 @@ public class ErrorFrame extends JFrame {
 		return sb.toString();
 	}
 
-//	public static void main(String[] args) {
-//		// Ejemplo de uso
-//		ErrorFrame errorFrame = new ErrorFrame();
-//
-//		// Muestra un error simple
-//		errorFrame.showError("Error inesperado!");
-//
-//		// Muestra una excepción
-//		errorFrame.showError(new Exception("Archivo no encontrado"));
-//
-//		// Muestra un mapa
-//		Map<String, String> errorMap = Map.of("Código", "404", "Mensaje", "No encontrado");
-//		errorFrame.showError(errorMap);
-//
-//		// Muestra una lista de errores
-//		List<String> errorList = List.of("Error 1", "Error 2", "Error 3");
-//		errorFrame.showError(errorList);
-//	}
+	public void setController(AppController controller) {
+		this.controller = controller;
+	}
 }

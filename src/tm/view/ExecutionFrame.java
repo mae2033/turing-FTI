@@ -1,6 +1,7 @@
 package tm.view;
 
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridLayout;
 
@@ -10,7 +11,6 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSlider;
@@ -18,7 +18,6 @@ import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 
 import tm.app.AppController;
-import java.awt.FlowLayout;
 
 @SuppressWarnings("serial")
 public class ExecutionFrame extends JFrame {
@@ -37,7 +36,7 @@ public class ExecutionFrame extends JFrame {
 	private int indice_ant = -1;
 	private int espacioAdicional = 0;
 	private int TAPE_SIZE;
-
+	private String vacio = "\u25B2";
 	private int velocidad = 500; // Velocidad inicial
 
 	public ExecutionFrame() {
@@ -53,10 +52,12 @@ public class ExecutionFrame extends JFrame {
 
 	private void initSpeedPanel() {
 		lblInterval = new JLabel(String.format("delay: " + velocidad + " ms"));
+		lblInterval.setBounds(256, 12, 105, 25);
 		lblInterval.setFont(new Font("Tahoma", Font.BOLD, 13));
 //		lblInterval.setBounds(244, 98, 125, 27);
 
 		sliderVelocidad = new JSlider(0, 1000, 500);
+		sliderVelocidad.setBounds(0, 5, 238, 32);
 //		sliderVelocidad.setBounds(10, 98, 224, 32);
 		sliderVelocidad.setMajorTickSpacing(250);
 		sliderVelocidad.setSnapToTicks(true);
@@ -69,9 +70,9 @@ public class ExecutionFrame extends JFrame {
 		sliderVelocidad.setAutoscrolls(true);
 
 		speedPanel = new JPanel();
-		speedPanel.setBounds(10, 124, 318, 42);
+		speedPanel.setBounds(12, 139, 361, 43);
 		getContentPane().add(speedPanel);
-		speedPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
+		speedPanel.setLayout(null);
 
 		speedPanel.add(sliderVelocidad);
 		speedPanel.add(lblInterval);
@@ -79,7 +80,7 @@ public class ExecutionFrame extends JFrame {
 	}
 
 	private void frameConfig() {
-		setSize(530, 217);
+		setSize(600, 233);
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
 		setLocationRelativeTo(null);
 		setResizable(false);
@@ -88,7 +89,7 @@ public class ExecutionFrame extends JFrame {
 
 	private void initPanelButtons() {
 		buttonsPanel = new JPanel();
-		buttonsPanel.setBounds(390, 140, 114, 27);
+		buttonsPanel.setBounds(385, 139, 187, 43);
 		getContentPane().add(buttonsPanel);
 
 		btnExecute = new JButton(new ImageIcon(ExecutionFrame.class.getResource("/images/Play22.png")));
@@ -110,8 +111,8 @@ public class ExecutionFrame extends JFrame {
 		texto = new JTextField();
 		texto.setToolTipText("input");
 		texto.setFont(new Font("Tahoma", Font.PLAIN, 15));
-		texto.setLocation(154, 99);
-		texto.setSize(224, 27);
+		texto.setLocation(12, 100);
+		texto.setSize(361, 27);
 		getContentPane().add(texto);
 	}
 
@@ -121,18 +122,19 @@ public class ExecutionFrame extends JFrame {
 		cintaPanel.setLayout(new GridLayout(1, TAPE_SIZE));
 
 		JScrollPane scrollPane = new JScrollPane(cintaPanel);
-		scrollPane.setToolTipText("\u25B2 blank symbol");
-		scrollPane.setBounds(10, 11, 494, 76);
+		scrollPane.setToolTipText(vacio + " blank symbol");
+		scrollPane.setBounds(11, 11, 562, 83);
 		getContentPane().add(scrollPane);
 
 		cinta = new JLabel[TAPE_SIZE];
 
 		for (int i = 0; i < TAPE_SIZE; i++) {
-			cinta[i] = new JLabel("\u25B2", SwingConstants.CENTER);
+			cinta[i] = new JLabel(String.valueOf(vacio), SwingConstants.CENTER);
 			cinta[i].setBorder(BorderFactory.createLineBorder(Color.BLACK));
-			cinta[i].setFont(new Font("Arial", Font.PLAIN, 24));
+			cinta[i].setFont(new Font("Arial", Font.PLAIN, 28));
 			cintaPanel.add(cinta[i]);
 		}
+		cintaPanel.revalidate();
 	}
 
 	private void actualizarTimer() {
@@ -140,13 +142,12 @@ public class ExecutionFrame extends JFrame {
 	}
 
 	private void run(String input) {
-		// updateCompleteTape(input);
 		try {
 			controller.ejecutar(input);
 			btnExecute.setEnabled(true);
 		} catch (InterruptedException ex) {
 			btnExecute.setEnabled(true);
-			JOptionPane.showMessageDialog(this, "Error: " + ex.getMessage());
+			controller.showError(ex);
 		}
 	}
 
@@ -155,7 +156,7 @@ public class ExecutionFrame extends JFrame {
 			if (i < espacioAdicional && i > espacioAdicional + input.length())
 				cinta[i].setText(input.charAt(i - espacioAdicional) + "");
 			else
-				cinta[i].setText("\u25B2");
+				cinta[i].setText(String.valueOf(vacio));
 		}
 	}
 
@@ -200,7 +201,7 @@ public class ExecutionFrame extends JFrame {
 			for (int i = 0; i < espacioAdicional; i++) {
 				nuevaCinta[i] = new JLabel("\u25B2", SwingConstants.CENTER);
 				nuevaCinta[i].setBorder(BorderFactory.createLineBorder(Color.BLACK));
-				nuevaCinta[i].setFont(new Font("Arial", Font.PLAIN, 24));
+				nuevaCinta[i].setFont(new Font("Arial", Font.PLAIN, 28));
 				cintaPanel.add(nuevaCinta[i], i);
 			}
 
@@ -221,20 +222,16 @@ public class ExecutionFrame extends JFrame {
 			for (int i = TAPE_SIZE; i < nuevoTamano; i++) {
 				nuevaCinta[i] = new JLabel("\u25B2", SwingConstants.CENTER);
 				nuevaCinta[i].setBorder(BorderFactory.createLineBorder(Color.BLACK));
-				nuevaCinta[i].setFont(new Font("Arial", Font.PLAIN, 24));
+				nuevaCinta[i].setFont(new Font("Arial", Font.PLAIN, 28));
 				cintaPanel.add(nuevaCinta[i]);
 			}
 
 			cinta = nuevaCinta;
 			TAPE_SIZE = nuevoTamano;
+
 			cintaPanel.revalidate();
 			cintaPanel.repaint();
 		}
-	}
-
-	public void reset() {
-		espacioAdicional = 0;
-		initTapePanel();
 	}
 
 	public void setController(AppController controller) {

@@ -7,31 +7,34 @@ import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import org.apache.log4j.Logger;
+
 import tm.app.AppController;
 
 public class Maquina {
 
-	AppController controller;
+	private final static Logger logger = Logger.getLogger(AppController.class);
 
-	private Timer timer;
-	private boolean running = false; // Control del estado
-	static int VELOCIDAD = 500;
-	final int INIT_INDEX = 50;
+	private AppController controller;
+	private Timer timer; 
+	private boolean running = false; // control del estado de la maquina
+	static int VELOCIDAD = 500; // delay de las tareas
+	final int INIT_INDEX = 50; // indice inicial
 	private int index = INIT_INDEX; // Campo de instancia para el índice
 	private static final char LIMITE_MARCA = '~';
-	Scanner fs;
-	String nameMachine;
+	private Scanner fs;
+	// elementos de la maquina
+	String maquinaNombre;
 	Set<Character> alpha;
 	int cantidadEstados;
 	int estadoInicial;
 	int estadoActual;
 	int estadoFinal;
 	char espacioSym;
-
 	StringBuffer Tape; // Cinta
 	List<Estado> states; // estados
 
-	private String result;
+	private String resultado;
 
 	public void carga(Scanner f) {
 		alpha = null;
@@ -47,7 +50,7 @@ public class Maquina {
 		reset();
 		setTape(inputstr);
 		running = true;
-
+		logger.info("ejecuto maquina");
 		if (timer == null) {
 			timer = new Timer();
 		}
@@ -69,15 +72,18 @@ public class Maquina {
 					stop();
 
 				}
-				displayTape(index);
+//				displayTape(index);
+				printTape(index);
 			}
 		};
 		timer.scheduleAtFixedRate(task, VELOCIDAD, VELOCIDAD + 1);
 	}
 
+	/** ejecutar la maquina simulada */
 	public void runTuring(String inputstr) throws InterruptedException {
 		setTape(inputstr);
 		int index = INIT_INDEX;
+		estadoActual = estadoInicial;
 		while (estadoActual != estadoFinal) {
 			index = makeTrans(index);
 			if (index == -1)
@@ -139,8 +145,6 @@ public class Maquina {
 	}
 
 	public void setTape(String inputstr) {
-//		if (running)
-//			return;
 		this.Tape = new StringBuffer(buildTape(inputstr, espacioSym));
 		printTape(INIT_INDEX);
 	}
@@ -150,13 +154,12 @@ public class Maquina {
 		for (char c : array) {
 			if (!alpha.contains(c))
 				return false;
-
 		}
 		return true;
 	}
 
 	public String getName() {
-		return nameMachine;
+		return maquinaNombre;
 	}
 
 	public void stop() {
@@ -176,11 +179,11 @@ public class Maquina {
 	}
 
 	private void update() {
-		result = Tape.toString();
-		result = result.replaceAll("^[\\" + LIMITE_MARCA + "]+|[\\" + LIMITE_MARCA + "]+~", "");
-		result = result.replaceAll("^[" + espacioSym + "]+|[" + espacioSym + "]+~", "");
-		controller.updateTextField(result);
-		System.out.println("Resultado de la cinta: " + result);
+		resultado = Tape.toString();
+		resultado = resultado.replaceAll("^[\\" + LIMITE_MARCA + "]+|[\\" + LIMITE_MARCA + "]+~", "");
+		resultado = resultado.replaceAll("^[" + espacioSym + "]+|[" + espacioSym + "]+~", "");
+		controller.updateTextField(resultado);
+		// System.out.println("resultadoado de la cinta: " + resultado);
 	}
 
 	public void setVelocidad(int nuevaVelocidad) {
@@ -199,8 +202,8 @@ public class Maquina {
 		return Tape.toString();
 	}
 
-	public String getResult() {
-		return result;
+	public String getResultado() {
+		return resultado;
 	}
 
 	public boolean isRunning() {

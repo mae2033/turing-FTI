@@ -36,16 +36,11 @@ public class MaquinaBuilder {
 	 *          de la máquina desde una fuente de entrada.
 	 */
 	public void buildMachine(Maquina m) {
-		m.nameMachine = readString();
-		System.out.println(m.nameMachine);
+		m.maquinaNombre = readString();
 		m.alpha = readAlphabet();
-		System.out.println(m.alpha);
 		m.espacioSym = readChar();
-		System.out.println(m.espacioSym);
 		m.cantidadEstados = readInt();
-		System.out.println(m.cantidadEstados);
 		m.estadoInicial = readInt();
-		System.out.println(m.estadoInicial);
 		m.estadoActual = m.estadoInicial;
 		for (int i = 0; i < m.cantidadEstados; i++)
 			addState(i, m);

@@ -2,16 +2,10 @@ package tm.view;
 
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
+import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-
 import java.io.File;
-import java.util.List;
-
-import javax.swing.filechooser.FileFilter;
-import javax.swing.filechooser.FileNameExtensionFilter;
-
-import tm.app.AppController;
 
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
@@ -19,34 +13,36 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
+import javax.swing.filechooser.FileFilter;
+import javax.swing.filechooser.FileNameExtensionFilter;
 
-import java.awt.Font;
+import tm.app.AppController;
 
 public class WelcomeScreen extends JFrame {
 	private AppController controller;
 
 	public WelcomeScreen() {
 		setTitle("FTI");
-		setSize(364, 111);
+		setSize(369, 131);
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
 		setLocationRelativeTo(null);
 		setResizable(false);
-
-		// Configurar layout antes de agregar componentes
-		getContentPane().setLayout(new BorderLayout());
+		getContentPane().setLayout(null);
 
 		// Crear y agregar etiqueta de bienvenida
-		JLabel label = new JLabel("Bienvenido a la Maquina de Turing", SwingConstants.CENTER);
-		label.setFont(new Font("Rockwell", Font.BOLD, 18));
-		getContentPane().add(label, BorderLayout.NORTH);
+		JLabel label = new JLabel("Simulador Maquina de Turing", SwingConstants.CENTER);
+		label.setBounds(22, 5, 311, 22);
+		label.setFont(new Font("Rockwell", Font.BOLD, 20));
+		getContentPane().add(label);
 
 		// Crear panel para los botones
 		JPanel buttonPanel = new JPanel();
+		buttonPanel.setBounds(22, 39, 311, 43);
 		buttonPanel.setLayout(new FlowLayout());
 
-		// Bot�n para seleccionar archivo
-		JButton startButton = new JButton("Seleccionar Maquina");
-		startButton.setFont(new Font("SansSerif", Font.PLAIN, 14));
+		// Boton para seleccionar archivo
+		JButton startButton = new JButton("Seleccionar");
+		startButton.setFont(new Font("SansSerif", Font.PLAIN, 16));
 		startButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -55,9 +51,9 @@ public class WelcomeScreen extends JFrame {
 		});
 		buttonPanel.add(startButton);
 
-		// Bot�n para salir
+		// Boton para salir
 		JButton exitButton = new JButton("Salir");
-		exitButton.setFont(new Font("SansSerif", Font.PLAIN, 14));
+		exitButton.setFont(new Font("SansSerif", Font.PLAIN, 16));
 		exitButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -66,8 +62,7 @@ public class WelcomeScreen extends JFrame {
 		});
 		buttonPanel.add(exitButton);
 
-		// Agregar panel de botones al centro del layout
-		getContentPane().add(buttonPanel, BorderLayout.CENTER);
+		getContentPane().add(buttonPanel);
 
 		setVisible(true);
 	}
@@ -82,13 +77,14 @@ public class WelcomeScreen extends JFrame {
 			if (controller.formatoValido(selectedFile))
 				controller.iniciarMaquina(selectedFile);
 			else
-				error(controller.getError());
+				error();
+
 		}
 	}
 
-	@SuppressWarnings("unused")
-	public void error(List<String> s) {
-		String err = s.toString();
+	public void error() {
+		Object error = controller.getError();
+//		controller.showError(error);
 	}
 
 	public void setController(AppController controller) {

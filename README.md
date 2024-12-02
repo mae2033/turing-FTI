@@ -1,5 +1,5 @@
 # Maquina de Turing
-![Maquina de Turing](./src/resources/img/turingMachine.png)
+![Maquina de Turing](./images/turingMachine.png)
 Breve descripcion o introduccion al proyecto, explicando de que se trata y que problemas soluciona.
 
 ## Tabla de Contenidos
