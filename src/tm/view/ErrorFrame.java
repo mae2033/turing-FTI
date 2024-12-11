@@ -10,12 +10,10 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 
-import tm.app.AppController;
-
+@SuppressWarnings("serial")
 public class ErrorFrame extends JFrame {
 
 	private JTextArea errorTextArea;
-	private AppController controller;
 
 	public ErrorFrame() {
 		setTitle("Error");
@@ -97,9 +95,5 @@ public class ErrorFrame extends JFrame {
 			sb.append("\tat ").append(element).append("\n");
 		}
 		return sb.toString();
-	}
-
-	public void setController(AppController controller) {
-		this.controller = controller;
 	}
 }

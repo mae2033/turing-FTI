@@ -1,12 +1,11 @@
 package tm.view;
 
 import java.awt.Color;
-import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.GridLayout;
 
 import javax.swing.BorderFactory;
-import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -28,6 +27,8 @@ public class ExecutionFrame extends JFrame {
 	private JPanel speedPanel;
 	private JButton btnExecute;
 	private JButton btnBack;
+	private JButton btnStop;
+	private JButton btnClean;
 	private JSlider sliderVelocidad;
 	private JTextField texto;
 	private JPanel cintaPanel;
@@ -52,7 +53,7 @@ public class ExecutionFrame extends JFrame {
 
 	private void initSpeedPanel() {
 		lblInterval = new JLabel(String.format("delay: " + velocidad + " ms"));
-		lblInterval.setBounds(256, 12, 105, 25);
+		lblInterval.setBounds(244, 5, 105, 25);
 		lblInterval.setFont(new Font("Tahoma", Font.BOLD, 13));
 //		lblInterval.setBounds(244, 98, 125, 27);
 
@@ -88,23 +89,27 @@ public class ExecutionFrame extends JFrame {
 	}
 
 	private void initPanelButtons() {
-		buttonsPanel = new JPanel();
-		buttonsPanel.setBounds(385, 139, 187, 43);
-		getContentPane().add(buttonsPanel);
-
 		btnExecute = new JButton(new ImageIcon(ExecutionFrame.class.getResource("/images/Play22.png")));
 		btnExecute.setToolTipText("run machine");
-		btnExecute.setFont(new Font("Tahoma", Font.PLAIN, 15));
-		btnExecute.addActionListener(e -> run(texto.getText()));
-
+		btnExecute.addActionListener(e -> run());
 		btnBack = new JButton(new ImageIcon(ExecutionFrame.class.getResource("/images/Undo22.png")));
 		btnBack.setToolTipText("return to main");
-		btnBack.setFont(new Font("Tahoma", Font.PLAIN, 15));
-		btnBack.addActionListener(e -> controller.volverInicio());
-		buttonsPanel.setLayout(new BoxLayout(buttonsPanel, BoxLayout.X_AXIS));
+		btnBack.addActionListener(e -> volver());
+		btnStop = new JButton(new ImageIcon(ExecutionFrame.class.getResource("/images/Pause22.png")));
+		btnStop.setToolTipText("stop execute");
+		btnStop.addActionListener(e -> stop());
+		btnClean = new JButton(new ImageIcon(ExecutionFrame.class.getResource("/images/Trash22.png")));
+		btnClean.setToolTipText("clean");
+		btnClean.addActionListener(e -> clean());
 
+		buttonsPanel = new JPanel();
+		buttonsPanel.setBounds(383, 100, 189, 82);
+		buttonsPanel.setLayout(new FlowLayout(FlowLayout.RIGHT, 5, 5));
 		buttonsPanel.add(btnExecute);
+		buttonsPanel.add(btnStop);
+		buttonsPanel.add(btnClean);
 		buttonsPanel.add(btnBack);
+		getContentPane().add(buttonsPanel);
 	}
 
 	private void initTextField() {
@@ -141,14 +146,17 @@ public class ExecutionFrame extends JFrame {
 		controller.setVelocidad(velocidad);
 	}
 
-	private void run(String input) {
-		try {
-			controller.ejecutar(input);
-			btnExecute.setEnabled(true);
-		} catch (InterruptedException ex) {
-			btnExecute.setEnabled(true);
-			controller.showError(ex);
-		}
+	private void run() {
+		controller.ejecutar(texto.getText());
+	}
+
+	private void stop() {
+		controller.interrumpir();
+	}
+
+	private void volver() {
+		reset();
+		controller.volverInicio();
 	}
 
 	public void updateCompleteTape(String input) {
@@ -158,13 +166,6 @@ public class ExecutionFrame extends JFrame {
 			else
 				cinta[i].setText(String.valueOf(vacio));
 		}
-	}
-
-	public void cleanText() {
-		for (int i = 0; i < TAPE_SIZE; i++) {
-			cinta[i].setText("\u25B2");
-		}
-		texto.setText("");
 	}
 
 	public void setText(String resultado) {
@@ -237,4 +238,34 @@ public class ExecutionFrame extends JFrame {
 	public void setController(AppController controller) {
 		this.controller = controller;
 	}
+
+	// se creo porque re-inicializar no funciona
+	private void resetTape() {
+		TAPE_SIZE = 5; // Tamaño inicial definido
+		espacioAdicional = 0; // indicadores para el manejo de la cinta
+		indice_ant = -1;
+		cinta = new JLabel[TAPE_SIZE];
+		cintaPanel.removeAll();
+		for (int i = 0; i < TAPE_SIZE; i++) {
+			cinta[i] = new JLabel(String.valueOf(vacio), SwingConstants.CENTER);
+			cinta[i].setBorder(BorderFactory.createLineBorder(Color.BLACK));
+			cinta[i].setFont(new Font("Arial", Font.PLAIN, 28));
+			cintaPanel.add(cinta[i]);
+		}
+		cintaPanel.revalidate();
+		cintaPanel.repaint();
+	}
+
+	private void clean() {
+		stop();
+		reset();
+	}
+
+	public void reset() {
+		texto.setText("");
+		velocidad = 500;
+		sliderVelocidad.setValue(velocidad);
+		resetTape();
+	}
+
 }

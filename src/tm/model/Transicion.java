@@ -2,28 +2,54 @@ package tm.model;
 
 public class Transicion {
 
-	char read;
-	char write;
-	char shift;
-	int nextState;
+	private char lee;
+	private char escribe;
+	private char cambio;
+	private int siguiente;
 
 	/**
 	 * Divide string en lectura, escritura, desplazamiento y el numero del siguiente
 	 * estado, en ese orden.
 	 */
 	public Transicion(String s) {
-		read = s.charAt(0);
-		write = s.charAt(2);
-		shift = s.charAt(4);
+		setLee(s.charAt(0));
+		setEscribe(s.charAt(2));
+		setCambio(s.charAt(4));
 
 		int l = s.length();
 		String substr = s.substring(6, l).trim();
-		nextState = Integer.parseInt(substr);
+		setSiguiente(Integer.parseInt(substr));
 	}
 
-	@Override
-	public String toString() {
-		return "[Lee=" + read + ", escribe=" + write + ", desplaza=" + shift + ", sig.Estado=" + nextState + "]";
+	public char getLee() {
+		return lee;
 	}
 
+	public void setLee(char lee) {
+		this.lee = lee;
+	}
+
+	public char getEscribe() {
+		return escribe;
+	}
+
+	public void setEscribe(char escribe) {
+		this.escribe = escribe;
+	}
+
+	public char getCambio() {
+		return cambio;
+	}
+
+	public void setCambio(char cambio) {
+		this.cambio = cambio;
+	}
+
+	public int getSiguiente() {
+		return siguiente;
+	}
+
+	public void setSiguiente(int siguiente) {
+		this.siguiente = siguiente;
+	}
 }

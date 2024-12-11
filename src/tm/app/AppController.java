@@ -2,9 +2,8 @@ package tm.app;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.List;
-import org.apache.log4j.Logger;
-
 import tm.model.Maquina;
 import tm.utils.FileScanner;
 import tm.utils.FileValidator;
@@ -13,8 +12,6 @@ import tm.view.ExecutionFrame;
 import tm.view.WelcomeScreen;
 
 public class AppController {
-
-	final static Logger logger = Logger.getLogger(AppController.class);
 
 	private FileScanner fs;
 	private FileValidator fv;
@@ -47,24 +44,8 @@ public class AppController {
 		this.errGUI = errGUI;
 	}
 
-	public String getNombre() {
-		return maquina.getName();
-	}
-
-	public void ejecutar(String inputStr) throws InterruptedException {
+	public void ejecutar(String inputStr) {
 		maquina.runTuringWithTimer(inputStr);
-	}
-
-	public String getResultado() {
-		return maquina.getResultado();
-	}
-
-	public void setCinta(String s) {
-		maquina.setTape(s);
-	}
-
-	public String getCinta() {
-		return maquina.getTape();
 	}
 
 	public void escribirCinta(char c, int i) {
@@ -73,39 +54,43 @@ public class AppController {
 
 	public void iniciarMaquina(File file) {
 		try {
+			if (!formatoValido(file)) {
+				throw new IllegalArgumentException("El formato del archivo no es válido.");
+			}
 			fs = new FileScanner(file);
 			maquina.carga(fs.getFileScan());
-			seleccion(maquina.getName());
+			seleccion(maquina.getNombreMaquina());
 		} catch (FileNotFoundException e) {
-			logger.error("archivo no encontrado");
-//			showError(e);
+			showError("Archivo no encontrado: " + e.getMessage());
+		} catch (IllegalArgumentException e) {
+			showError(fv.getErrores());
+		} catch (Exception e) {
+			showError("Ocurrió un error inesperado: " + e.getMessage());
 		}
 	}
 
 	private void seleccion(String s) {
-		logger.info("inicio maquina");
 		wsGUI.dispose();
 		efGUI.setTitle(s);
 		efGUI.setVisible(true);
 	}
 
 	public void volverInicio() {
-		efGUI.cleanText();
-		efGUI.dispose();
+		efGUI.setVisible(false);
 		wsGUI.setVisible(true);
-		maquina.stop();
+		maquina.detener();
 		maquina.reset();
 	}
 
 	public void interrumpir() {
-		maquina.stop();
+		maquina.detener();
 	}
 
 	public void setVelocidad(int v) {
 		maquina.setVelocidad(v);
 	}
 
-	public boolean formatoValido(File archivoSeleccionado) {
+	public boolean formatoValido(File archivoSeleccionado) throws IOException {
 		return fv.validarArchivo(archivoSeleccionado);
 	}
 
@@ -113,13 +98,11 @@ public class AppController {
 		return fv.getErrores();
 	}
 
-	public void updateTextField(String string) {
+	public void setResultadoPantalla(String string) {
 		efGUI.setText(string);
 	}
 
 	public void showError(Object error) {
 		errGUI.showError(error);
-
 	}
-
 }

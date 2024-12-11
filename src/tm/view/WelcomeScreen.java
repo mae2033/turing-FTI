@@ -1,6 +1,5 @@
 package tm.view;
 
-import java.awt.BorderLayout;
 import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
@@ -18,6 +17,7 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 
 import tm.app.AppController;
 
+@SuppressWarnings("serial")
 public class WelcomeScreen extends JFrame {
 	private AppController controller;
 
@@ -67,24 +67,23 @@ public class WelcomeScreen extends JFrame {
 		setVisible(true);
 	}
 
+
+	// nueva version
 	private void openFileChooser() {
 		JFileChooser fileChooser = new JFileChooser("./src/resources");
 		FileFilter filter = new FileNameExtensionFilter("Text Files", "txt");
 		fileChooser.setFileFilter(filter);
+
 		int returnValue = fileChooser.showOpenDialog(this);
 		if (returnValue == JFileChooser.APPROVE_OPTION) {
 			File selectedFile = fileChooser.getSelectedFile();
-			if (controller.formatoValido(selectedFile))
-				controller.iniciarMaquina(selectedFile);
-			else
-				error();
-
+			controller.iniciarMaquina(selectedFile); // Delegar todo al controlador
 		}
 	}
 
 	public void error() {
 		Object error = controller.getError();
-//		controller.showError(error);
+		controller.showError(error);
 	}
 
 	public void setController(AppController controller) {

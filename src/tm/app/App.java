@@ -7,5 +7,4 @@ public class App {
 		af.carga();
 		af.cargaControlador();
 	}
-
 }

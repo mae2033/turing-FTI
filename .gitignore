@@ -1,12 +1,8 @@
-# .log files
-*.log
-
-# ignore ALL files in ANY directory named temp
-temp/ 
-
-# Eclipse project files
+### Eclipse project files ###
 .classpath
 .project
-
-# 
+.metadata
+bin/
+temp/ 
+tmp/
 .settings/

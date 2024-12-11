@@ -36,13 +36,13 @@ public class MaquinaBuilder {
 	 *          de la máquina desde una fuente de entrada.
 	 */
 	public void buildMachine(Maquina m) {
-		m.maquinaNombre = readString();
-		m.alpha = readAlphabet();
-		m.espacioSym = readChar();
-		m.cantidadEstados = readInt();
-		m.estadoInicial = readInt();
-		m.estadoActual = m.estadoInicial;
-		for (int i = 0; i < m.cantidadEstados; i++)
+		m.setNombreMaquina(readString());
+		m.setAlfabeto(readAlphabet());
+		m.setEspacio(readChar());
+		m.setCantidadEstados(readInt());
+		m.setEstadoInicial(readInt());
+		m.setEstadoActual(m.getEstadoInicial());
+		for (int i = 0; i < m.getCantidadEstados(); i++)
 			addState(i, m);
 	}
 
@@ -63,15 +63,15 @@ public class MaquinaBuilder {
 
 		ArrayList<Transicion> trs = new ArrayList<>();
 		if (trCount == 0)
-			m.estadoFinal = ind;
+			m.setEstadoFinal(ind);
 
 		for (int i = 0; i < trCount; i++) {
 			String s = readString();
 			Transicion tr = new Transicion(s);
 			trs.add(tr);
 		}
-		Estado st = new Estado(ind, trs);
-		m.states.add(st);
+		Estado st = new Estado(trs);
+		m.getEstados().add(st);
 	}
 
 	/**

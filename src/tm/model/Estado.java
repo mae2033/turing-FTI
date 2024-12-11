@@ -4,21 +4,31 @@ import java.util.List;
 
 public class Estado {
 
-	String nombre;
-	List<Transicion> transiciones;
+	private String nombre;
+	private List<Transicion> transiciones;
 
-	@Deprecated
 	public Estado(List<Transicion> transiciones) {
-		this.transiciones = transiciones;
+		this.setTransiciones(transiciones);
 	}
 
 	public Estado(int i, List<Transicion> transiciones) {
-		this.nombre = "q" + i;
-		this.transiciones = transiciones;
+		this.setNombre(String.valueOf(i));
+		this.setTransiciones(transiciones);
 	}
 
-	@Override
-	public String toString() {
+	public String getNombre() {
 		return nombre;
+	}
+
+	public void setNombre(String nombre) {
+		this.nombre = nombre;
+	}
+
+	public List<Transicion> getTransiciones() {
+		return transiciones;
+	}
+
+	public void setTransiciones(List<Transicion> transiciones) {
+		this.transiciones = transiciones;
 	}
 }

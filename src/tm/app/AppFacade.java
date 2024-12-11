@@ -30,7 +30,7 @@ public class AppFacade {
 		maquina.setController(controller);
 		efGUI.setController(controller);
 		wsGUI.setController(controller);
-		errGUI.setController(controller);
+//		errGUI.setController(controller);
 	}
 
 	void cargaControlador() {

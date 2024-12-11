@@ -4,105 +4,88 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 import java.util.Set;
-import java.util.Timer;
 import java.util.TimerTask;
 
-import org.apache.log4j.Logger;
+import javax.swing.JOptionPane; // revisar y quitar
 
 import tm.app.AppController;
 
 public class Maquina {
 
-	private final static Logger logger = Logger.getLogger(AppController.class);
-
 	private AppController controller;
-	private Timer timer; 
-	private boolean running = false; // control del estado de la maquina
-	static int VELOCIDAD = 500; // delay de las tareas
-	final int INIT_INDEX = 50; // indice inicial
-	private int index = INIT_INDEX; // Campo de instancia para el índice
-	private static final char LIMITE_MARCA = '~';
-	private Scanner fs;
+	private MaquinaTimer maquinaTimer;
+	static int VELOCIDAD = 500; // delay
+	private final int INDICE_INICIAL = 75; // inicio
+	private int indice;
 	// elementos de la maquina
-	String maquinaNombre;
-	Set<Character> alpha;
-	int cantidadEstados;
-	int estadoInicial;
-	int estadoActual;
-	int estadoFinal;
-	char espacioSym;
-	StringBuffer Tape; // Cinta
-	List<Estado> states; // estados
-
-	private String resultado;
+	private String nombreMaquina;
+	private Set<Character> alfabeto;
+	private int cantidadEstados;
+	private int estadoInicial;
+	private int estadoActual;
+	private int estadoFinal; // estado aceptador
+	private char espacio; // simbolo espacio
+	private List<Estado> estados;
+	private Cinta tape;
 
 	public void carga(Scanner f) {
-		alpha = null;
-		Tape = new StringBuffer();
-		states = new ArrayList<>();
+		setIndice(INDICE_INICIAL);
+		maquinaTimer = new MaquinaTimer();
+		setAlfabeto(null);
+		setEstados(new ArrayList<>());
 		MaquinaBuilder builder = new MaquinaBuilder(f);
 		builder.buildMachine(this);
+		setTape(new Cinta(getIndice(), espacio));
 	}
 
-	public void runTuringWithTimer(String inputstr) {
-		if (running)
+	public void runTuringWithTimer(String entrada) {
+		if (maquinaTimer.estaActivo())
 			return;
 		reset();
-		setTape(inputstr);
-		running = true;
-		logger.info("ejecuto maquina");
-		if (timer == null) {
-			timer = new Timer();
-		}
-		TimerTask task = new TimerTask() {
+		getTape().inicializar(entrada);
+		maquinaTimer.iniciar(new TimerTask() {
 			@Override
 			public void run() {
 				try {
 					if (estadoActual == estadoFinal) {
-						stop();
+						actualiza();
+						detener();
 						return;
 					}
-					index = makeTrans(index);
-					if (index == -1) {
-						stop();
+					setIndice(realizarTransicion(getIndice()));
+					if (getIndice() == -1) {
+						detener();
 						throw new InterruptedException("ERROR: Cabeza salió de la cinta. Máquina detenida.");
 					}
 				} catch (InterruptedException e) {
-					e.printStackTrace();
-					stop();
-
+					detener();
+					JOptionPane.showMessageDialog(null, e); // arreglar esta parte
 				}
-//				displayTape(index);
-				printTape(index);
 			}
-		};
-		timer.scheduleAtFixedRate(task, VELOCIDAD, VELOCIDAD + 1);
+		}, VELOCIDAD, VELOCIDAD + 1);
 	}
 
-	/** ejecutar la maquina simulada */
 	public void runTuring(String inputstr) throws InterruptedException {
-		setTape(inputstr);
-		int index = INIT_INDEX;
-		estadoActual = estadoInicial;
-		while (estadoActual != estadoFinal) {
-			index = makeTrans(index);
+		getTape().inicializar(inputstr);
+		int index = INDICE_INICIAL;
+		setEstadoActual(estadoInicial);
+		while (getEstadoActual() != getEstadoFinal()) {
+			index = realizarTransicion(index);
 			if (index == -1)
-				throw new InterruptedException("ERROR: Cabeza salio de la Tape. Maquina detenida.");
-			printTape(index);
+				throw new InterruptedException("ERROR: Cabeza salio de la cinta. Maquina detenida.");
 		}
-		update();
+		actualiza();
 	}
 
-	public int makeTrans(int index) throws InterruptedException {
-		if (Tape.charAt(index) == LIMITE_MARCA)
-			throw new InterruptedException("Cabeza salio de la Cinta. Maquina detenida.");
-		Estado st = states.get(estadoActual);
-		for (Transicion tr : st.transiciones) {
-			if (tr.read == Tape.charAt(index)) {
-				Tape.replace(index, index + 1, String.valueOf(tr.write));
-				escribirCinta(tr.write, index);
-				estadoActual = tr.nextState;
-				switch (tr.shift) {
+	public int realizarTransicion(int index) throws InterruptedException {
+		char actual = getTape().leer(index);
+		Estado st = estados.get(estadoActual);
+		for (Transicion tr : st.getTransiciones()) {
+			if (tr.getLee() == actual) {
+				getTape().escribir(index, tr.getEscribe());
+				escribirCinta(tr.getEscribe(), index);
+				setEstadoActual(tr.getSiguiente());
+				switch (tr.getCambio()) {
 				case 'R':
 					return index + 1;
 				case 'L':
@@ -117,73 +100,24 @@ public class Maquina {
 		return -1;
 	}
 
-	private void escribirCinta(char write, int index) {
-		if (write == espacioSym)
-			write = '\u25B2';
-		controller.escribirCinta(write, index - INIT_INDEX + 1);
+	private void escribirCinta(char escribe, int index) {
+		if (escribe == getEspacio())
+			escribe = '\u25B2';
+		controller.escribirCinta(escribe, index - INDICE_INICIAL + 1);
 	}
 
-	/* metodo para pruebas */
-	public String displayTape(int index) {
-		String aTape = printTape(index);
-		System.out.println(aTape);
-		return aTape;
-	}
-
-	public String printTape(int index) {
-		StringBuilder output = new StringBuilder();
-		output.append(Tape).append("\n");
-		output.append(String.valueOf(' ').repeat(index));
-		output.append(" ^q").append(estadoActual).append("\n");
-		return output.toString();
-	}
-
-	public String buildTape(String str, char blank) {
-		String blanks = String.valueOf(blank).repeat(INIT_INDEX - 1);
-		String trailingBlanks = String.valueOf(blank).repeat(30);
-		return String.format("%s%s%s%s%s", LIMITE_MARCA, blanks, str, trailingBlanks, LIMITE_MARCA);
-	}
-
-	public void setTape(String inputstr) {
-		this.Tape = new StringBuffer(buildTape(inputstr, espacioSym));
-		printTape(INIT_INDEX);
-	}
-
-	public boolean validarInput(String inputstr) {
-		char[] array = inputstr.toCharArray();
-		for (char c : array) {
-			if (!alpha.contains(c))
-				return false;
-		}
-		return true;
-	}
-
-	public String getName() {
-		return maquinaNombre;
-	}
-
-	public void stop() {
-		if (timer != null) {
-			timer.cancel();
-			timer = null;
-		}
-		update();
-		running = false;
+	public void detener() {
+		maquinaTimer.detener();
 	}
 
 	public void reset() {
-		running = false;
-		estadoActual = estadoInicial; // O el valor que defina el estado inicial
-		index = INIT_INDEX; // O la posición inicial de la cinta
-
+		setEstadoActual(estadoInicial);
+		setIndice(INDICE_INICIAL);
 	}
 
-	private void update() {
-		resultado = Tape.toString();
-		resultado = resultado.replaceAll("^[\\" + LIMITE_MARCA + "]+|[\\" + LIMITE_MARCA + "]+~", "");
-		resultado = resultado.replaceAll("^[" + espacioSym + "]+|[" + espacioSym + "]+~", "");
-		controller.updateTextField(resultado);
-		// System.out.println("resultadoado de la cinta: " + resultado);
+	private void actualiza() {
+		String resultado = getTape().obtenerResultado();
+		controller.setResultadoPantalla(resultado);
 	}
 
 	public void setVelocidad(int nuevaVelocidad) {
@@ -195,19 +129,87 @@ public class Maquina {
 	}
 
 	public int getInitIndex() {
-		return INIT_INDEX;
+		return INDICE_INICIAL;
 	}
 
-	public String getTape() {
-		return Tape.toString();
+	public int getCantidadEstados() {
+		return cantidadEstados;
 	}
 
-	public String getResultado() {
-		return resultado;
+	public void setCantidadEstados(int cantidadEstados) {
+		this.cantidadEstados = cantidadEstados;
 	}
 
-	public boolean isRunning() {
-		return running;
+	public Set<Character> getAlfabeto() {
+		return alfabeto;
+	}
+
+	public void setAlfabeto(Set<Character> alfabeto) {
+		this.alfabeto = alfabeto;
+	}
+
+	public String getNombreMaquina() {
+		return nombreMaquina;
+	}
+
+	public void setNombreMaquina(String nombreMaquina) {
+		this.nombreMaquina = nombreMaquina;
+	}
+
+	public int getEstadoInicial() {
+		return estadoInicial;
+	}
+
+	public void setEstadoInicial(int estadoInicial) {
+		this.estadoInicial = estadoInicial;
+	}
+
+	public int getEstadoActual() {
+		return estadoActual;
+	}
+
+	public void setEstadoActual(int estadoActual) {
+		this.estadoActual = estadoActual;
+	}
+
+	public int getEstadoFinal() {
+		return estadoFinal;
+	}
+
+	public void setEstadoFinal(int estadoFinal) {
+		this.estadoFinal = estadoFinal;
+	}
+
+	public char getEspacio() {
+		return espacio;
+	}
+
+	public void setEspacio(char espacio) {
+		this.espacio = espacio;
+	}
+
+	public List<Estado> getEstados() {
+		return estados;
+	}
+
+	public void setEstados(List<Estado> estados) {
+		this.estados = estados;
+	}
+
+	public int getIndice() {
+		return indice;
+	}
+
+	public void setIndice(int indice) {
+		this.indice = indice;
+	}
+
+	public Cinta getTape() {
+		return tape;
+	}
+
+	public void setTape(Cinta tape) {
+		this.tape = tape;
 	}
 
 }

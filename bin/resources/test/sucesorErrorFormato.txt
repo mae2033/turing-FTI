@@ -1,4 +1,5 @@
 MAQUINA sucesor de un binario
+   
 // simbolos de entrada
 0 1
 // simbolo espacio
@@ -10,8 +11,8 @@ MAQUINA sucesor de un binario
 // transiciones: formato (lee, escribe, mueve, salta)
 // estado 0 - error de L/R/N 
 3
-1 1 Y 0
-0 0 M 0
+1 1 A 0
+0 0 B 0
 - - C 1
 // estado 1 - proceso de incremento 
 3
