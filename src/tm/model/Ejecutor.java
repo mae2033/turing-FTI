@@ -1,48 +1,58 @@
 package tm.model;
 
+import java.util.Scanner;
 import java.util.TimerTask;
+
+import javax.swing.JOptionPane;
 
 import tm.app.AppController;
 
-// todavia no se utiliza
-public class MaquinaExecutor {
+/**
+ * Clase responsable de manejar la ejecución de la Máquina de Turing, incluyendo
+ * el control del flujo y la interacción con el temporizador.
+ */
+public class Ejecutor {
 
+	private int VELOCIDAD = 500; // delay
 	private Maquina maquina;
-	private MaquinaTimer maquinaTimer;
+	private Temporizador timer;
 	private AppController controller;
 
-	public MaquinaExecutor() {
-		this.maquina = new Maquina();
-		this.maquinaTimer = new MaquinaTimer();
+	public Ejecutor() {
+		timer = new Temporizador();
+		maquina = new Maquina();
 	}
 
-	public void runWithTimer(String entrada, int velocidad) {
-		if (maquinaTimer.estaActivo())
+	public void carga(Scanner f) {
+		maquina.carga(f);
+	}
+
+	public void runWithTimer(String entrada) {
+		if (estaActivo())
 			return;
-
-		maquina.setIndice(maquina.getEstadoInicial());
+		reset();
 		maquina.getTape().inicializar(entrada);
-
-		maquinaTimer.iniciar(new TimerTask() {
+		timer.iniciar(new TimerTask() {
 			@Override
 			public void run() {
 				try {
 					if (maquina.getEstadoActual() == maquina.getEstadoFinal()) {
+						actualiza();
 						detener();
 						return;
 					}
 					int nuevoIndice = realizarTransicion(maquina.getIndice());
 					if (nuevoIndice == -1) {
 						detener();
-						throw new RuntimeException("Error: Cabeza salió de la cinta.");
+						throw new InterruptedException("Error: Cabeza salió de la cinta.");
 					}
 					maquina.setIndice(nuevoIndice);
-				} catch (RuntimeException e) {
+				} catch (InterruptedException e) {
 					detener();
-					controller.showError(e.getMessage());
+					JOptionPane.showMessageDialog(null, e); // arreglar esta parte
 				}
 			}
-		}, velocidad, velocidad + 1);
+		}, VELOCIDAD, VELOCIDAD + 1);
 	}
 
 	private int realizarTransicion(int index) {
@@ -68,17 +78,39 @@ public class MaquinaExecutor {
 		return -1; // Placeholder
 	}
 
-	public void detener() {
-		maquinaTimer.detener();
+	private void actualiza() {
+		String resultado = maquina.getTape().obtenerResultado();
+		controller.setResultadoPantalla(resultado);
 	}
 
-	public void escribirCinta(char escribe, int index) {
+	private void escribirCinta(char escribe, int index) {
 		if (escribe == maquina.getEspacio())
 			escribe = '\u25B2';
 		controller.escribirCinta(escribe, index - maquina.getInitIndex() + 1);
 	}
 
+	public void detener() {
+		timer.detener();
+	}
+
+	public boolean estaActivo() {
+		return timer.estaActivo();
+	}
+
+	public void reset() {
+		maquina.reset();
+	}
+
 	public void setController(AppController controller) {
 		this.controller = controller;
 	}
+
+	public void setVelocidad(int velocidad) {
+		VELOCIDAD = velocidad;
+	}
+
+	public String getNombre() {
+		return maquina.getNombreMaquina();
+	}
+
 }

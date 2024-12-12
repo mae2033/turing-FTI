@@ -18,7 +18,7 @@ MAQUINA sucesor de un binario
 // estado 1 - proceso de incremento 
 3
 1 0 L 1
-0 1 R 2
+0 1 N 2
 - 1 N 2
 // estado 2 se detiene la maquina no hay transiciones definidas
 0

@@ -155,8 +155,8 @@ public class ExecutionFrame extends JFrame {
 	}
 
 	private void volver() {
-		reset();
 		controller.volverInicio();
+		reset();
 	}
 
 	public void updateCompleteTape(String input) {

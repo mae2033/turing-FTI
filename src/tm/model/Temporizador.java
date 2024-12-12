@@ -4,11 +4,11 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 /**
- * Clase responsable de gestionar el temporizador para la ejecución de la
- * máquina de Turing. Controla el estado de ejecución de la máquina, permitiendo
- * iniciar y detener la ejecución a intervalos específicos.
+ * Clase responsable de gestionar el temporizador para la ejecuciï¿½n de la
+ * mï¿½quina de Turing. Controla el estado de ejecuciï¿½n de la mï¿½quina, permitiendo
+ * iniciar y detener la ejecuciï¿½n a intervalos especï¿½ficos.
  */
-public class MaquinaTimer {
+public class Temporizador {
 
 	private Timer timer;
 	private boolean running = false;

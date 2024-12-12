@@ -4,7 +4,8 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.List;
-import tm.model.Maquina;
+
+import tm.model.Ejecutor;
 import tm.utils.FileScanner;
 import tm.utils.FileValidator;
 import tm.view.ErrorFrame;
@@ -15,7 +16,7 @@ public class AppController {
 
 	private FileScanner fs;
 	private FileValidator fv;
-	private Maquina maquina;
+	private Ejecutor ejecutor;
 	private WelcomeScreen wsGUI;
 	private ExecutionFrame efGUI;
 	private ErrorFrame errGUI;
@@ -28,8 +29,8 @@ public class AppController {
 		this.fv = fv;
 	}
 
-	public void setMaquina(Maquina maquina) {
-		this.maquina = maquina;
+	public void setEjecutor(Ejecutor ejecutor) {
+		this.ejecutor = ejecutor;
 	}
 
 	public void setWsGUI(WelcomeScreen wsGUI) {
@@ -45,7 +46,7 @@ public class AppController {
 	}
 
 	public void ejecutar(String inputStr) {
-		maquina.runTuringWithTimer(inputStr);
+		ejecutor.runWithTimer(inputStr);
 	}
 
 	public void escribirCinta(char c, int i) {
@@ -58,8 +59,8 @@ public class AppController {
 				throw new IllegalArgumentException("El formato del archivo no es válido.");
 			}
 			fs = new FileScanner(file);
-			maquina.carga(fs.getFileScan());
-			seleccion(maquina.getNombreMaquina());
+			ejecutor.carga(fs.getFileScan());
+			seleccion(ejecutor.getNombre());
 		} catch (FileNotFoundException e) {
 			showError("Archivo no encontrado: " + e.getMessage());
 		} catch (IllegalArgumentException e) {
@@ -76,18 +77,18 @@ public class AppController {
 	}
 
 	public void volverInicio() {
+		ejecutor.detener();
+		ejecutor.reset();
 		efGUI.setVisible(false);
 		wsGUI.setVisible(true);
-		maquina.detener();
-		maquina.reset();
 	}
 
 	public void interrumpir() {
-		maquina.detener();
+		ejecutor.detener();
 	}
 
 	public void setVelocidad(int v) {
-		maquina.setVelocidad(v);
+		ejecutor.setVelocidad(v);
 	}
 
 	public boolean formatoValido(File archivoSeleccionado) throws IOException {
