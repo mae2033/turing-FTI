@@ -14,35 +14,45 @@ import tm.view.WelcomeScreen;
 
 public class AppController {
 
-	private FileScanner fs;
-	private FileValidator fv;
+	private FileScanner fileScanner;
+	private FileValidator fileValidator;
 	private Ejecutor ejecutor;
-	private WelcomeScreen wsGUI;
-	private ExecutionFrame efGUI;
-	private ErrorFrame errGUI;
+	private WelcomeScreen welcomeScreen;
+	private ExecutionFrame executionFrame;
+	private ErrorFrame errorFrame;
 
-	public void setFs(FileScanner fs) {
-		this.fs = fs;
+	public AppController(FileScanner fileScanner, FileValidator fileValidator, Ejecutor ejecutor, WelcomeScreen welcomeScreen,
+			ExecutionFrame executionFrame, ErrorFrame errorFrame) {
+		this.fileScanner = fileScanner;
+		this.fileValidator = fileValidator;
+		this.ejecutor = ejecutor;
+		this.welcomeScreen = welcomeScreen;
+		this.executionFrame = executionFrame;
+		this.errorFrame = errorFrame;
 	}
 
-	public void setFv(FileValidator fv) {
-		this.fv = fv;
+	public void setFs(FileScanner fileScanner) {
+		this.fileScanner = fileScanner;
+	}
+
+	public void setFv(FileValidator fileValidator) {
+		this.fileValidator = fileValidator;
 	}
 
 	public void setEjecutor(Ejecutor ejecutor) {
 		this.ejecutor = ejecutor;
 	}
 
-	public void setWsGUI(WelcomeScreen wsGUI) {
-		this.wsGUI = wsGUI;
+	public void setWsGUI(WelcomeScreen welcomeScreen) {
+		this.welcomeScreen = welcomeScreen;
 	}
 
-	public void setEfGUI(ExecutionFrame efGUI) {
-		this.efGUI = efGUI;
+	public void setEfGUI(ExecutionFrame executionFrame) {
+		this.executionFrame = executionFrame;
 	}
 
-	public void setErrGUI(ErrorFrame errGUI) {
-		this.errGUI = errGUI;
+	public void setErrGUI(ErrorFrame errorFrame) {
+		this.errorFrame = errorFrame;
 	}
 
 	public void ejecutar(String inputStr) {
@@ -50,37 +60,45 @@ public class AppController {
 	}
 
 	public void escribirCinta(char c, int i) {
-		efGUI.updateTape(c, i);
+		executionFrame.updateTape(c, i);
 	}
 
+	/**
+	 * Configura e inicia la máquina de Turing utilizando un archivo de entrada.
+	 *
+	 * @param file el archivo con la configuración de la máquina de Turing.
+	 * @throws IllegalArgumentException si el archivo tiene un formato inválido.
+	 * @throws FileNotFoundException    si el archivo no se encuentra.
+	 * @throws Exception                si ocurre un error inesperado.
+	 */
 	public void iniciarMaquina(File file) {
 		try {
 			if (!formatoValido(file)) {
 				throw new IllegalArgumentException("El formato del archivo no es válido.");
 			}
-			fs = new FileScanner(file);
-			ejecutor.carga(fs.getFileScan());
+			fileScanner = new FileScanner(file);
+			ejecutor.carga(fileScanner.getFileScan());
 			seleccion(ejecutor.getNombre());
 		} catch (FileNotFoundException e) {
 			showError("Archivo no encontrado: " + e.getMessage());
 		} catch (IllegalArgumentException e) {
-			showError(fv.getErrores());
+			showError(fileValidator.getErrores());
 		} catch (Exception e) {
 			showError("Ocurrió un error inesperado: " + e.getMessage());
 		}
 	}
 
 	private void seleccion(String s) {
-		wsGUI.dispose();
-		efGUI.setTitle(s);
-		efGUI.setVisible(true);
+		welcomeScreen.dispose();
+		executionFrame.setTitle(s);
+		executionFrame.setVisible(true);
 	}
 
 	public void volverInicio() {
 		ejecutor.detener();
 		ejecutor.reset();
-		efGUI.setVisible(false);
-		wsGUI.setVisible(true);
+		executionFrame.setVisible(false);
+		welcomeScreen.setVisible(true);
 	}
 
 	public void interrumpir() {
@@ -92,18 +110,21 @@ public class AppController {
 	}
 
 	public boolean formatoValido(File archivoSeleccionado) throws IOException {
-		return fv.validarArchivo(archivoSeleccionado);
+		return fileValidator.validarArchivo(archivoSeleccionado);
 	}
 
+	/**
+	 * Errores encontrados al usar el validador
+	 */
 	public List<String> getError() {
-		return fv.getErrores();
+		return fileValidator.getErrores();
 	}
 
 	public void setResultadoPantalla(String string) {
-		efGUI.setText(string);
+		executionFrame.afterRun(string);
 	}
 
 	public void showError(Object error) {
-		errGUI.showError(error);
+		errorFrame.showError(error);
 	}
 }

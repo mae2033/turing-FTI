@@ -1,5 +1,6 @@
 package tm.utils;
 
+// no se usa
 public class BinaryTool {
 
 	public static int toDecimal(String s) {

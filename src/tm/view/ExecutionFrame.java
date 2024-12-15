@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.GridLayout;
+import java.util.Stack;
 
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
@@ -17,28 +18,31 @@ import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 
 import tm.app.AppController;
+import tm.utils.Bufer;
 
 @SuppressWarnings("serial")
 public class ExecutionFrame extends JFrame {
 
 	private AppController controller;
-
 	private JPanel buttonsPanel;
 	private JPanel speedPanel;
+	private JPanel cintaPanel;
 	private JButton btnExecute;
-	private JButton btnBack;
+	private JButton btnReturn;
 	private JButton btnStop;
-	private JButton btnClean;
+	private JButton btnBack; // ultima
+	private JButton btnClean; // frena y limpia
 	private JSlider sliderVelocidad;
 	private JTextField texto;
-	private JPanel cintaPanel;
-	private JLabel[] cinta;
 	private JLabel lblInterval;
+	private JLabel[] cinta;
+	private Stack<Bufer> bufferStack = new Stack<>();
 	private int indice_ant = -1;
 	private int espacioAdicional = 0;
 	private int TAPE_SIZE;
-	private String vacio = "\u25B2";
 	private int velocidad = 500; // Velocidad inicial
+	private String vacio = "\u25B2";
+	private boolean running = false;
 
 	public ExecutionFrame() {
 		super();
@@ -55,11 +59,9 @@ public class ExecutionFrame extends JFrame {
 		lblInterval = new JLabel(String.format("delay: " + velocidad + " ms"));
 		lblInterval.setBounds(244, 5, 105, 25);
 		lblInterval.setFont(new Font("Tahoma", Font.BOLD, 13));
-//		lblInterval.setBounds(244, 98, 125, 27);
 
-		sliderVelocidad = new JSlider(0, 1000, 500);
+		sliderVelocidad = new JSlider(0, 1000, velocidad);
 		sliderVelocidad.setBounds(0, 5, 238, 32);
-//		sliderVelocidad.setBounds(10, 98, 224, 32);
 		sliderVelocidad.setMajorTickSpacing(250);
 		sliderVelocidad.setSnapToTicks(true);
 		sliderVelocidad.setPaintLabels(true);
@@ -89,26 +91,35 @@ public class ExecutionFrame extends JFrame {
 	}
 
 	private void initPanelButtons() {
+		// ejecutar
 		btnExecute = new JButton(new ImageIcon(ExecutionFrame.class.getResource("/images/Play22.png")));
-		btnExecute.setToolTipText("run machine");
 		btnExecute.addActionListener(e -> run());
-		btnBack = new JButton(new ImageIcon(ExecutionFrame.class.getResource("/images/Undo22.png")));
-		btnBack.setToolTipText("return to main");
-		btnBack.addActionListener(e -> volver());
+		btnExecute.setToolTipText("Ejecutar");
+		// pausar
 		btnStop = new JButton(new ImageIcon(ExecutionFrame.class.getResource("/images/Pause22.png")));
-		btnStop.setToolTipText("stop execute");
 		btnStop.addActionListener(e -> stop());
+		btnStop.setToolTipText("detener ejecucion");
+		btnStop.setEnabled(running);
+		// anterior
+		btnBack = new JButton(new ImageIcon(ExecutionFrame.class.getResource("/images/StepBack22.png")));
+		btnBack.addActionListener(e -> restoreBufferState());
+		btnBack.setToolTipText("cinta anterior");
+		// frena y limpia
 		btnClean = new JButton(new ImageIcon(ExecutionFrame.class.getResource("/images/Trash22.png")));
-		btnClean.setToolTipText("clean");
 		btnClean.addActionListener(e -> clean());
+		btnClean.setToolTipText("limpiar y borrar");
+		// retornar
+		btnReturn = new JButton(new ImageIcon(ExecutionFrame.class.getResource("/images/Undo22.png")));
+		btnReturn.addActionListener(e -> volver());
 
 		buttonsPanel = new JPanel();
 		buttonsPanel.setBounds(383, 100, 189, 82);
-		buttonsPanel.setLayout(new FlowLayout(FlowLayout.RIGHT, 5, 5));
+		buttonsPanel.setLayout(new FlowLayout(FlowLayout.RIGHT));
 		buttonsPanel.add(btnExecute);
 		buttonsPanel.add(btnStop);
-		buttonsPanel.add(btnClean);
 		buttonsPanel.add(btnBack);
+		buttonsPanel.add(btnClean);
+		buttonsPanel.add(btnReturn);
 		getContentPane().add(buttonsPanel);
 	}
 
@@ -146,11 +157,21 @@ public class ExecutionFrame extends JFrame {
 		controller.setVelocidad(velocidad);
 	}
 
+	public void setController(AppController controller) {
+		this.controller = controller;
+	}
+
 	private void run() {
+		if (!running)
+			saveBufferState();
+		running = true;
+		btnStop.setEnabled(running);
 		controller.ejecutar(texto.getText());
 	}
 
 	private void stop() {
+		running = false;
+		btnStop.setEnabled(running);
 		controller.interrumpir();
 	}
 
@@ -159,17 +180,38 @@ public class ExecutionFrame extends JFrame {
 		reset();
 	}
 
-	public void updateCompleteTape(String input) {
-		for (int i = 0; i < TAPE_SIZE; i++) {
-			if (i < espacioAdicional && i > espacioAdicional + input.length())
-				cinta[i].setText(input.charAt(i - espacioAdicional) + "");
-			else
-				cinta[i].setText(String.valueOf(vacio));
-		}
-	}
-
 	public void setText(String resultado) {
 		texto.setText(resultado);
+	}
+
+	public void title(String s) {
+		setTitle(s);
+	}
+
+	public void afterRun(String resultado) {
+		running = false;
+		btnStop.setEnabled(running);
+		setText(resultado);
+	}
+
+	private void clean() {
+		stop();
+		reset();
+	}
+
+	public void reset() {
+		running = false;
+		btnStop.setEnabled(running);
+		texto.setText("");
+		velocidad = 500;
+		sliderVelocidad.setValue(velocidad);
+		bufferStack = new Stack<>();
+		resetTape();
+	}
+
+	// la idea es tener un pila para ir hacia atras
+	public void saveBufferState() {
+		bufferStack.push(new Bufer(cinta, indice_ant, espacioAdicional, TAPE_SIZE, texto.getText()));
 	}
 
 	public void updateTape(char c, int indice) {
@@ -184,33 +226,23 @@ public class ExecutionFrame extends JFrame {
 		indice_ant = indice;
 	}
 
-	public void title(String s) {
-		setTitle(s);
-	}
-
 	public void redimensionarCinta(int indice) {
 		if (indice <= 0) {
 			int espacioAdicional = Math.abs(indice) + 2; // Espacio necesario hacia la izquierda
 			int nuevoTamano = TAPE_SIZE + espacioAdicional;
-
 			JLabel[] nuevaCinta = new JLabel[nuevoTamano];
-
-			// Desplazar los elementos existentes hacia la derecha
-			System.arraycopy(cinta, 0, nuevaCinta, espacioAdicional, TAPE_SIZE);
-
-			// Inicializar las nuevas posiciones vacías al inicio
-			for (int i = 0; i < espacioAdicional; i++) {
+			System.arraycopy(cinta, 0, nuevaCinta, espacioAdicional, TAPE_SIZE);// Desplazar los elementos existentes
+																				// hacia la derecha
+			for (int i = 0; i < espacioAdicional; i++) { // Inicializar las nuevas posiciones vacías al inicio
 				nuevaCinta[i] = new JLabel("\u25B2", SwingConstants.CENTER);
 				nuevaCinta[i].setBorder(BorderFactory.createLineBorder(Color.BLACK));
 				nuevaCinta[i].setFont(new Font("Arial", Font.PLAIN, 28));
 				cintaPanel.add(nuevaCinta[i], i);
 			}
-
 			cinta = nuevaCinta;
 			TAPE_SIZE = nuevoTamano;
 			cintaPanel.revalidate();
 			cintaPanel.repaint();
-
 			// Ajustar la posición inicial lógica para que coincida con la expansión
 			this.espacioAdicional += espacioAdicional;
 		}
@@ -235,10 +267,6 @@ public class ExecutionFrame extends JFrame {
 		}
 	}
 
-	public void setController(AppController controller) {
-		this.controller = controller;
-	}
-
 	// se creo porque re-inicializar no funciona
 	private void resetTape() {
 		TAPE_SIZE = 5; // Tamaño inicial definido
@@ -256,16 +284,51 @@ public class ExecutionFrame extends JFrame {
 		cintaPanel.repaint();
 	}
 
-	private void clean() {
-		stop();
-		reset();
+	// Restaurar el último estado desde la pila
+	private void restoreBufferState() {
+		if (!bufferStack.isEmpty() && !running) {
+			Bufer lastBuffer = bufferStack.pop();
+			cinta = lastBuffer.getCinta();
+			indice_ant = lastBuffer.getIndiceAnt();
+			espacioAdicional = lastBuffer.getEspacioAdicional();
+			TAPE_SIZE = lastBuffer.getTapeSize();
+			texto.setText(lastBuffer.getResultado());
+
+			cintaPanel.removeAll();
+			for (JLabel cell : cinta) {
+				cintaPanel.add(cell);
+			}
+			cintaPanel.revalidate();
+			cintaPanel.repaint();
+		}
 	}
 
-	public void reset() {
-		texto.setText("");
-		velocidad = 500;
-		sliderVelocidad.setValue(velocidad);
-		resetTape();
+	// funciona, todavia no se aplica
+	public void ajustarCinta() { // la idea es usarlo cuando termina de ejecutar
+		if (espacioAdicional > 0) {
+			JLabel[] nuevaCinta = new JLabel[TAPE_SIZE - espacioAdicional];
+			System.arraycopy(cinta, espacioAdicional, nuevaCinta, 0, nuevaCinta.length);
+			cinta = nuevaCinta;
+			TAPE_SIZE = nuevaCinta.length;
+			espacioAdicional = 0;
+
+			// Actualizar el panel de la cinta
+			cintaPanel.removeAll();
+			for (int i = 0; i < TAPE_SIZE; i++) {
+				cintaPanel.add(cinta[i]);
+			}
+			cintaPanel.revalidate();
+			cintaPanel.repaint();
+		}
+	}
+
+	public void updateCompleteTape(String input) {
+		for (int i = 0; i < TAPE_SIZE; i++) {
+			if (i < espacioAdicional && i > espacioAdicional + input.length())
+				cinta[i].setText(input.charAt(i - espacioAdicional) + "");
+			else
+				cinta[i].setText(String.valueOf(vacio));
+		}
 	}
 
 }

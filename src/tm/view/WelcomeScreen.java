@@ -1,5 +1,6 @@
 package tm.view;
 
+import java.awt.BorderLayout;
 import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
@@ -22,23 +23,31 @@ public class WelcomeScreen extends JFrame {
 	private AppController controller;
 
 	public WelcomeScreen() {
+		config();
+		initComponentes();
+
+	}
+
+	private void config() {
 		setTitle("FTI");
-		setSize(369, 131);
+		setSize(396, 162);
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
 		setLocationRelativeTo(null);
-		setResizable(false);
-		getContentPane().setLayout(null);
+		getContentPane().setLayout(new BorderLayout());
+	}
 
-		// Crear y agregar etiqueta de bienvenida
-		JLabel label = new JLabel("Simulador Maquina de Turing", SwingConstants.CENTER);
-		label.setBounds(22, 5, 311, 22);
-		label.setFont(new Font("Rockwell", Font.BOLD, 20));
-		getContentPane().add(label);
+	private void initComponentes() {
+		// Crear panel para las etiquetas
+		JPanel lblPanel = new JPanel(new BorderLayout());
+		JLabel title = new JLabel("Bienvenido", SwingConstants.CENTER);
+		title.setFont(new Font("Rockwell", Font.BOLD, 20));
+		JLabel detail = new JLabel("Simulador Maquina de Turing", SwingConstants.CENTER);
+		detail.setFont(new Font("Rockwell", Font.PLAIN, 17));
+		lblPanel.add(title, BorderLayout.NORTH);
+		lblPanel.add(detail, BorderLayout.SOUTH);
 
 		// Crear panel para los botones
-		JPanel buttonPanel = new JPanel();
-		buttonPanel.setBounds(22, 39, 311, 43);
-		buttonPanel.setLayout(new FlowLayout());
+		JPanel buttonPanel = new JPanel(new FlowLayout());
 
 		// Boton para seleccionar archivo
 		JButton startButton = new JButton("Seleccionar");
@@ -49,7 +58,7 @@ public class WelcomeScreen extends JFrame {
 				openFileChooser();
 			}
 		});
-		buttonPanel.add(startButton);
+		buttonPanel.add(startButton, BorderLayout.CENTER);
 
 		// Boton para salir
 		JButton exitButton = new JButton("Salir");
@@ -60,13 +69,11 @@ public class WelcomeScreen extends JFrame {
 				System.exit(0);
 			}
 		});
-		buttonPanel.add(exitButton);
+		buttonPanel.add(exitButton, BorderLayout.LINE_END);
 
-		getContentPane().add(buttonPanel);
-
-		setVisible(true);
+		getContentPane().add(lblPanel, BorderLayout.NORTH);
+		getContentPane().add(buttonPanel, BorderLayout.SOUTH);
 	}
-
 
 	// nueva version
 	private void openFileChooser() {
@@ -77,13 +84,8 @@ public class WelcomeScreen extends JFrame {
 		int returnValue = fileChooser.showOpenDialog(this);
 		if (returnValue == JFileChooser.APPROVE_OPTION) {
 			File selectedFile = fileChooser.getSelectedFile();
-			controller.iniciarMaquina(selectedFile); // Delegar todo al controlador
+			controller.iniciarMaquina(selectedFile); 
 		}
-	}
-
-	public void error() {
-		Object error = controller.getError();
-		controller.showError(error);
 	}
 
 	public void setController(AppController controller) {

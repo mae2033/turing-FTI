@@ -3,8 +3,6 @@ package tm.model;
 import java.util.Scanner;
 import java.util.TimerTask;
 
-import javax.swing.JOptionPane;
-
 import tm.app.AppController;
 
 /**
@@ -49,7 +47,7 @@ public class Ejecutor {
 					maquina.setIndice(nuevoIndice);
 				} catch (InterruptedException e) {
 					detener();
-					JOptionPane.showMessageDialog(null, e); // arreglar esta parte
+					controller.showError("Error: Cabeza salió de la cinta.");
 				}
 			}
 		}, VELOCIDAD, VELOCIDAD + 1);
