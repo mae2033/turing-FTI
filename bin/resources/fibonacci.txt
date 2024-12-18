@@ -152,7 +152,7 @@ MAQUINA fibonacci
 1 1 R 26
 # # R 26 
 - - L 27
-// estado 27
+// estado 27 - incremento 
 3
 0 1 L 19
 1 0 L 27

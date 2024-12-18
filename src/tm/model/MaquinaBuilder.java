@@ -7,8 +7,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
- * Clase herramienta para la construccion de una {@link Maquina} turing simulada
- *
+ * Herramienta para la construccion de una {@link Maquina} turing simulada
  */
 public class MaquinaBuilder {
 
@@ -23,14 +22,14 @@ public class MaquinaBuilder {
 	}
 
 	/**
-	 * Construye la máquina de Turing a partir de la entrada proporcionada a través
+	 * Construye la maquina de Turing a partir de la entrada proporcionada a traves
 	 * de un objeto {@link Maquina}.
 	 * 
-	 * Este método lee el título de la máquina, los símbolos de entrada, el símbolo
+	 * Este metodo lee el título de la maquina, los simbolos de entrada, el símbolo
 	 * de espacio, la cantidad de estados definidos y el estado inicial. A partir de
 	 * los símbolos de entrada, se crea un conjunto único de caracteres. Luego, se
 	 * establece el estado actual en el estado inicial y se agregan los estados a la
-	 * máquina mediante el método {@link #addEstado(int)}.
+	 * maquina mediante el método {@link #addState(int, Maquina)}.
 	 * 
 	 * @param m Un objeto {@link Maquina} que se utiliza para leer la configuración
 	 *          de la máquina desde una fuente de entrada.

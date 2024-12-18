@@ -8,8 +8,8 @@ import tm.view.ExecutionFrame;
 import tm.view.WelcomeScreen;
 
 /**
- * Clase encargada de la configuración y la inicialización de los componentes
- * necesarios para la ejecución de la aplicación.
+ * Configura e inicializa los componentes necesarios para la ejecución de la
+ * aplicación.
  */
 public class AppConfigurator {
 	private AppController controller;
@@ -29,10 +29,16 @@ public class AppConfigurator {
 		errorFrame = new ErrorFrame();
 	}
 
+	/**
+	 * Configura el controlador de la aplicación y lo asocia con los componentes.
+	 */
 	public void configurarComponentes() {
 		controller = new AppController(scanner, validator, ejecutor, welcomeFrame, executionFrame, errorFrame);
 	}
 
+	/**
+	 * Inicia la ejecución de la aplicación mostrando la pantalla de bienvenida.
+	 */
 	public void iniciarEjecucion() {
 		ejecutor.setController(controller);
 		executionFrame.setController(controller);

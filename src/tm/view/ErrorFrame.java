@@ -10,7 +10,6 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 
-@SuppressWarnings("serial")
 public class ErrorFrame extends JFrame {
 
 	private JTextArea errorTextArea;

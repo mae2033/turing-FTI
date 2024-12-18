@@ -18,7 +18,6 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 
 import tm.app.AppController;
 
-@SuppressWarnings("serial")
 public class WelcomeScreen extends JFrame {
 	private AppController controller;
 
@@ -84,7 +83,7 @@ public class WelcomeScreen extends JFrame {
 		int returnValue = fileChooser.showOpenDialog(this);
 		if (returnValue == JFileChooser.APPROVE_OPTION) {
 			File selectedFile = fileChooser.getSelectedFile();
-			controller.iniciarMaquina(selectedFile); 
+			controller.iniciarMaquina(selectedFile);
 		}
 	}
 

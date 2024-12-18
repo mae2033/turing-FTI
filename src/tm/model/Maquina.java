@@ -5,6 +5,9 @@ import java.util.List;
 import java.util.Scanner;
 import java.util.Set;
 
+/**
+ * Modelo de una máquina de Turing que maneja estados, transiciones y la cinta.
+ */
 public class Maquina {
 
 	private final int INDICE_INICIAL = 75; // inicio en la cinta
@@ -36,6 +39,9 @@ public class Maquina {
 		setTape(new Cinta(INDICE_INICIAL, espacio));
 	}
 
+	/**
+	 * Restablece el estado de la máquina a su configuración inicial.
+	 */
 	public void reset() {
 		setEstadoActual(estadoInicial);
 		setIndice(INDICE_INICIAL);
@@ -124,5 +130,5 @@ public class Maquina {
 	public void setTape(Cinta tape) {
 		this.tape = tape;
 	}
-	
+
 }
