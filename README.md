@@ -68,7 +68,7 @@ Si prefieres crear tu propio JAR o modificar el código, puedes clonar el reposi
    git clone https://github.com/mae2033/turing-FTI.git
    ```
 
-## Guía de Uso
+### Guía de Uso
 
 Una vez que el programa está en ejecución, puedes interactuar con él de la siguiente manera:
 
